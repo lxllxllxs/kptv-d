@@ -1,0 +1,21 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_type_bra`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_type_bra` AS 
+SELECT
+  `ptb`.`ID`        AS `ID`,
+  `pb`.`BRAND_ID`   AS `BRAND_ID`,
+  `pb`.`BRAND_NAME` AS `BRAND_NAME`,
+  `pt`.`TYPE_ID`    AS `TYPE_ID`,
+  `pt`.`TYPE_NAME`  AS `TYPE_NAME`,
+  `pt`.`QTY`        AS `QTY`
+FROM ((`xly_pdt_typ_bra` `ptb`
+    JOIN `xly_pdt_typ` `pt`)
+   JOIN `xly_pdt_bra` `pb`)
+WHERE ((`ptb`.`BRAND_ID` = `pb`.`BRAND_ID`)
+       AND (`ptb`.`TYPE_ID` = `pt`.`TYPE_ID`))$$
+
+DELIMITER ;

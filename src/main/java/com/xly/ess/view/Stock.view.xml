@@ -1,0 +1,1033 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="dtXlyProductSave" parent="dtProduct">
+      <Property name="acceptValidationState">warn</Property>
+      <PropertyDef name="gradesName">
+        <Property name="label">gradesName</Property>
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="specName">
+        <Property name="mapping">
+          <Property name="mapValues"></Property>
+        </Property>
+        <Property name="label">specName</Property>
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="categort">
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="patternNo">
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="color">
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="typeName">
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="brandName">
+        <Property name="required">true</Property>
+      </PropertyDef>
+    </DataType>
+    <DataType name="dtXlyPdtTypBra" parent="dtPdtTypBra">
+      <PropertyDef name="TYPE_BRAND">
+        <Property name="label">TYPE_BRAND</Property>
+      </PropertyDef>
+      <PropertyDef name="ID"/>
+    </DataType>
+    <DataType name="dtWhRecordSave" parent="dtWhRecord">
+      <Property name="acceptValidationState">warn</Property>
+      <PropertyDef name="typeName">
+        <Property name="label">入库类型</Property>
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="classesName">
+        <Property name="label">classesName</Property>
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="producedDate">
+        <Property name="label">producedDate</Property>
+        <Property name="dataType">Date</Property>
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="warehouse">
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="stock">
+        <Property name="required">true</Property>
+        <Validator name="validator1" type="range">
+          <Property name="minValue">0</Property>
+          <Property name="runAt">client</Property>
+          <Property name="maxValue">100000000</Property>
+          <Property name="resultMessage">不能为负数</Property>
+          <Property name="minValueValidateMode">allowEquals</Property>
+        </Validator>
+      </PropertyDef>
+      <PropertyDef name="optId"/>
+    </DataType>
+    <DataType name="dtOptType" parent="dtType">
+      <PropertyDef name="optId"/>
+    </DataType>
+    <DataType name="dataType3">
+      <PropertyDef name="total">
+        <Property name="label">total</Property>
+        <Property name="displayFormat">#,###件</Property>
+        <Property name="dataType">int</Property>
+      </PropertyDef>
+    </DataType>
+  </Model>
+  <View>
+    <DataSet id="dsTotal">
+      <ClientEvent name="onCreate">self.insert({&#xD;
+	$dataType: &quot;dsTotal&quot;,&#xD;
+	total : 0&#xD;
+});</ClientEvent>
+      <Property name="dataType">dataType3</Property>
+    </DataSet>
+    <DataSet id="dsPwRecord">
+      <ClientEvent name="onLoadData" signature="self,arg,dsTotal">var total=0.0;&#xD;
+        var entityList =self.getData();&#xD;
+        entityList.each(function(entity){&#xD;
+             var subTotal = entity.get(&quot;STOCK&quot;);&#xD;
+             total+=subTotal;&#xD;
+        });&#xD;
+		&#xD;
+        //设置DS的值&#xD;
+        dsTotal.getData().set(&quot;total&quot;,total);&#xD;
+		//显示合计&#xD;
+		view.get(&quot;#afTotal&quot;).refresh();</ClientEvent>
+      <Property name="dataType">[dtVWareRecord]</Property>
+      <Property name="readOnly">false</Property>
+      <Property name="dataProvider">stockService#getWareHouseRecordFilter</Property>
+      <Property name="pageSize">20</Property>
+      <Property name="loadMode">lazy</Property>
+    </DataSet>
+    <DataSet id="dsProductSave">
+      <ClientEvent name="onReady">&#xD;
+&#xD;
+</ClientEvent>
+      <Property name="dataType">dtXlyProductSave</Property>
+      <Property name="loadMode">lazy</Property>
+    </DataSet>
+    <DataSet id="dsXlyPdtType">
+      <Property name="dataType">[dtPdtType]</Property>
+      <Property name="dataProvider">productService#getType</Property>
+    </DataSet>
+    <DataSet id="dsXlyPdtBra">
+      <Property name="dataType">[dtPdtBra]</Property>
+      <Property name="dataProvider">productService#getBrand</Property>
+    </DataSet>
+    <DataSet id="dsXlyPdtGd">
+      <Property name="dataType">[dtPdtGd]</Property>
+      <Property name="dataProvider">productService#getGrades</Property>
+    </DataSet>
+    <DataSet id="dsXlyPdtSpec">
+      <Property name="dataType">[dtPdtSpec]</Property>
+      <Property name="dataProvider">productService#getSpec</Property>
+    </DataSet>
+    <DataSet id="dsWhRecordSave">
+      <Property name="dataType">dtWhRecordSave</Property>
+    </DataSet>
+    <DataSet id="dsClasses">
+      <Property name="dataType">[dtClasses]</Property>
+      <Property name="dataProvider">stockService#getAllClasses</Property>
+    </DataSet>
+    <DataSet id="dsWhType">
+      <Property name="dataType">[dtOptType]</Property>
+      <Property name="dataProvider">stockService#getAllType</Property>
+    </DataSet>
+    <AutoForm id="afCondition">
+      <Property name="createPrivateDataSet">true</Property>
+      <Property name="cols">*,*,*,*,*,*</Property>
+      <Property name="labelSeparator">：</Property>
+      <Property name="labelSpacing">1</Property>
+      <Property name="labelAlign">center</Property>
+      <AutoFormElement>
+        <Property name="name">typeName</Property>
+        <Property name="label">种类</Property>
+        <Property name="trigger">ddsdPdtTyp</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">brandName</Property>
+        <Property name="label">品牌</Property>
+        <Property name="trigger">ddsdPdtBra</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">categort</Property>
+        <Property name="label">类别</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">patternNo</Property>
+        <Property name="label">编号</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">gradesName</Property>
+        <Property name="label">等级</Property>
+        <Property name="trigger">dsddPdtGd</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">color</Property>
+        <Property name="label">色别</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">wareHouse</Property>
+        <Property name="label">库位</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">creater</Property>
+        <Property name="label">入库员</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">producedDate</Property>
+        <Property name="label">生产日期</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">classesName</Property>
+        <Property name="label">班次</Property>
+        <Property name="trigger">dsddClasses</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">optType</Property>
+        <Property name="label">操作</Property>
+        <Property name="trigger">dsddWhType</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">createTime</Property>
+        <Property name="label">操作时间</Property>
+        <Editor/>
+      </AutoFormElement>
+    </AutoForm>
+    <DataSetDropDown id="ddsdPdtTyp">
+      <ClientEvent name="onReady">&#xD;
+&#xD;
+</ClientEvent>
+      <ClientEvent name="onFilterItems">&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsXlyPdtType</Property>
+      <Property name="displayProperty">typeName</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">typeName</Property>
+      <Property name="editable">false</Property>
+      <Property name="assignmentMap">typeId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="ddsdPdtBra">
+      <ClientEvent name="onReady">&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsXlyPdtBra</Property>
+      <Property name="displayProperty">brandName</Property>
+      <Property name="property">brandName</Property>
+      <Property name="assignmentMap">brandId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddPdtGd">
+      <ClientEvent name="beforeExecute">//var gradesId = view.get(&quot;#dsXlyProduct.data:#.#GRADES_ID&quot;)&#xD;
+//弹出一个对话框  &#xD;
+ //  alert(&quot;gradesId=&quot;+gradesId);  &#xD;
+ //   var dsXlyProductSave = view.get(&quot;#dsXlyProductSave&quot;);&#xD;
+ //   dsXlyProductSave.set(&quot;parameter&quot;,{&#xD;
+ //       &quot;gradesId&quot;: gradesId&#xD;
+  //  });&#xD;
+  //  dsXlyProductSave.flushAsync();</ClientEvent>
+      <Property name="dataSet">dsXlyPdtGd</Property>
+      <Property name="displayProperty">gradesName</Property>
+      <Property name="property">gradesName</Property>
+      <Property name="assignmentMap">gradesId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddPdtSpec">
+      <ClientEvent name="beforeExecute">//var specId = view.get(&quot;#dsXlyProduct.data:#.#SPEC_ID&quot;)&#xD;
+//    var dsXlyProductSave = view.get(&quot;#dsXlyProductSave&quot;);&#xD;
+//    dsXlyProductSave.set(&quot;parameter&quot;,{&#xD;
+//        &quot;specId&quot;: specId&#xD;
+ //   });&#xD;
+ //   dsXlyProductSave.flushAsync();</ClientEvent>
+      <ClientEvent name="onReady">&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsXlyPdtSpec</Property>
+      <Property name="displayProperty">specName</Property>
+      <Property name="property">specName</Property>
+      <Property name="assignmentMap">specId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddWhType">
+      <Property name="dataSet">dsWhType</Property>
+      <Property name="displayProperty">typeName</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">typeName</Property>
+      <Property name="editable">false</Property>
+      <Property name="assignmentMap">optId=typeId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddClasses">
+      <Property name="dataSet">dsClasses</Property>
+      <Property name="displayProperty">classesName</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">classesName</Property>
+      <Property name="editable">false</Property>
+      <Property name="assignmentMap">classesId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <AutoForm id="afTotal">
+      <Property name="labelSeparator">：</Property>
+      <Property name="dataSet">dsTotal</Property>
+      <Property name="cols">*,*,*,*,*</Property>
+      <Property name="style">
+        <Property name="color">#e22018</Property>
+      </Property>
+      <AutoFormElement>
+        <Property name="name">total</Property>
+        <Property name="property">total</Property>
+        <Property name="label">总件数</Property>
+        <Property name="editorType">Label</Property>
+        <Editor/>
+      </AutoFormElement>
+    </AutoForm>
+    <ToolBar>
+      <DataPilot id="dp">
+        <Property name="itemCodes">pages,pageSize</Property>
+        <Property name="dataSet">dsPwRecord</Property>
+      </DataPilot>
+      <ToolBarButton id="btnQuery">
+        <ClientEvent name="onClick" signature="self,arg,afCondition,dsPwRecord">//获取afCondition绑定的实体对象&#xD;
+var entity = afCondition.get(&quot;entity&quot;);&#xD;
+//将实体对象作为参数传入，并异步刷新&#xD;
+dsPwRecord.set(&quot;parameter&quot;,entity).flushAsync();</ClientEvent>
+        <Property name="caption">查询</Property>
+        <Property name="icon"> url(>skin>common/icons.gif) -20px -40px</Property>
+      </ToolBarButton>
+      <ToolBarButton id="btnAdd">
+        <ClientEvent name="onClick" signature="self,arg,dialogAdd,dsPwRecord,dsProductSave,dsWhRecordSave">&#xD;
+&#xD;
+var entity = dsPwRecord.get(&quot;data:#&quot;);&#xD;
+var typeId = view.get(&quot;#dsPwRecord.data:#.#TYPE_ID&quot;);&#xD;
+var typeName = view.get(&quot;#dsPwRecord.data:#.#TYPE_NAME&quot;);&#xD;
+var brandId = view.get(&quot;#dsPwRecord.data:#.#BRAND_ID&quot;);&#xD;
+var brandName = view.get(&quot;#dsPwRecord.data:#.#BRAND_NAME&quot;);&#xD;
+var categort = view.get(&quot;#dsPwRecord.data:#.#CATEGORT&quot;);&#xD;
+var patternNo = view.get(&quot;#dsPwRecord.data:#.#PATTERN_NO&quot;);&#xD;
+var gradesId = view.get(&quot;#dsPwRecord.data:#.#GRADES_ID&quot;);&#xD;
+var gradesName = view.get(&quot;#dsPwRecord.data:#.#GRADES_NAME&quot;);&#xD;
+var color = view.get(&quot;#dsPwRecord.data:#.#COLOR&quot;);&#xD;
+var specId = view.get(&quot;#dsPwRecord.data:#.#SPEC_ID&quot;);&#xD;
+var specName = view.get(&quot;#dsPwRecord.data:#.#SPEC_NAME&quot;);&#xD;
+&#xD;
+var warehouse = view.get(&quot;#dsPwRecord.data:#.#WAREHOUSE&quot;);&#xD;
+var stock = view.get(&quot;#dsPwRecord.data:#.#STOCK&quot;);&#xD;
+var producedDate = view.get(&quot;#dsPwRecord.data:#.#PRODUCED_DATE&quot;);&#xD;
+var classesId = view.get(&quot;#dsPwRecord.data:#.#CLASSES_ID&quot;);&#xD;
+var classesName = view.get(&quot;#dsPwRecord.data:#.#CLASSES_NAME&quot;);&#xD;
+var optId = view.get(&quot;#dsPwRecord.data:#.#OPT_ID&quot;);&#xD;
+var optName = view.get(&quot;#dsPwRecord.data:#.#OPT_TYPE&quot;);&#xD;
+var remark = view.get(&quot;#dsPwRecord.data:#.#REMARK&quot;);&#xD;
+//设置弹框中下拉的默认值&#xD;
+dsProductSave.setData({&#xD;
+	$dataType : &quot;dsProductSave&quot;,&#xD;
+	typeId : typeId,&#xD;
+	typeName : typeName,&#xD;
+	brandId : brandId,&#xD;
+	brandName : brandName,&#xD;
+	categort : categort,&#xD;
+	patternNo : patternNo,&#xD;
+&#xD;
+	gradesId : gradesId,&#xD;
+	gradesName : gradesName,&#xD;
+	color : color,&#xD;
+	specId : specId,&#xD;
+	specName : specName,&#xD;
+	&#xD;
+}&#xD;
+);&#xD;
+&#xD;
+dsWhRecordSave.setData({&#xD;
+	$dataType : &quot;dsWhRecordSave&quot;,&#xD;
+	warehouse : warehouse,&#xD;
+	stock : stock,&#xD;
+	producedDate : producedDate,&#xD;
+	classesId : classesId,&#xD;
+	classesName : classesName,&#xD;
+	optId : optId,&#xD;
+	typeName : optName,&#xD;
+	remark : remark&#xD;
+}&#xD;
+);&#xD;
+&#xD;
+dialogAdd.show();&#xD;
+</ClientEvent>
+        <Property name="caption">入库</Property>
+        <Property name="icon">url(>skin>common/icons.gif) -120px -0px</Property>
+      </ToolBarButton>
+      <ToolBarButton id="btnEdit">
+        <ClientEvent name="onClick" signature="self,arg,dialogEdit,dsPwRecord">&#xD;
+&#xD;
+var entity = dsPwRecord.get(&quot;data:#&quot;);&#xD;
+&#xD;
+var producedDate = view.get(&quot;#dsPwRecord.data:#.#PRODUCED_DATE&quot;).formatDate(&quot;Y-m-d&quot;);&#xD;
+if(entity){&#xD;
+    var date = new Date();&#xD;
+		var strYear = date.getYear()+1900;&#xD;
+		var month = date.getMonth() + 1;&#xD;
+        var strDate = date.getDate();&#xD;
+		var pYear = producedDate.substring(0,4);&#xD;
+		var pMonth = producedDate.substring(5,7);&#xD;
+        var pDate = producedDate.substring(8,10);&#xD;
+&#xD;
+		if(parseInt(pYear) == parseInt(strYear) &amp;&amp; (parseInt(month) - parseInt(pMonth)&lt;2)){&#xD;
+			if(parseInt(month) - parseInt(pMonth) == 1 &amp;&amp; parseInt(strDate)>5){&#xD;
+				dorado.MessageBox.alert(&quot;该记录不能修改！&quot;);&#xD;
+			}else{&#xD;
+				dialogEdit.show();&#xD;
+			}&#xD;
+		    &#xD;
+		}else{&#xD;
+			dorado.MessageBox.alert(&quot;该记录不能修改！&quot;);&#xD;
+		}&#xD;
+}&#xD;
+</ClientEvent>
+        <Property name="caption">修改</Property>
+        <Property name="icon"> url(>skin>common/icons.gif) -200px -0px</Property>
+      </ToolBarButton>
+      <ToolBarButton id="btnDel">
+        <ClientEvent name="onClick" signature="self,arg,ajaxActionDel,dsPwRecord">var entity = dsPwRecord.get(&quot;data:#&quot;);&#xD;
+var recordId = view.get(&quot;#dsPwRecord.data:#.#RECORD_ID&quot;);&#xD;
+var productId = view.get(&quot;#dsPwRecord.data:#.#PRODUCT_ID&quot;);&#xD;
+var stock = view.get(&quot;#dsPwRecord.data:#.#STOCK&quot;);&#xD;
+var optId = view.get(&quot;#dsPwRecord.data:#.#OPT_ID&quot;);&#xD;
+var wareHouse = view.get(&quot;#dsPwRecord.data:#.#WAREHOUSE&quot;);&#xD;
+var producedDate = view.get(&quot;#dsPwRecord.data:#.#PRODUCED_DATE&quot;).formatDate(&quot;Y-m-d&quot;);&#xD;
+&#xD;
+&#xD;
+if(entity){&#xD;
+    dorado.MessageBox.confirm(&quot;确认要删除记录吗？&quot;, function(){&#xD;
+		var date = new Date();&#xD;
+		var strYear = date.getYear()+1900;&#xD;
+		var month = date.getMonth() + 1;&#xD;
+        var strDate = date.getDate();&#xD;
+		var pYear = producedDate.substring(0,4);&#xD;
+		var pMonth = producedDate.substring(5,7);&#xD;
+        var pDate = producedDate.substring(8,10);&#xD;
+&#xD;
+		if(parseInt(pYear) == parseInt(strYear) &amp;&amp; (parseInt(month) - parseInt(pMonth)&lt;2)){&#xD;
+			if(parseInt(month) - parseInt(pMonth) == 1 &amp;&amp; parseInt(strDate)>5){&#xD;
+				dorado.MessageBox.alert(&quot;该记录不能删除！&quot;);&#xD;
+			}else{&#xD;
+				 // 将参数拼装成JSON形式&#xD;
+                var parameter = {&#xD;
+                    recordId: recordId,&#xD;
+				    productId: productId,&#xD;
+                    stock: stock,&#xD;
+				    optId: optId,&#xD;
+				    wareHouse: wareHouse&#xD;
+                };&#xD;
+               // 调用AjaxAction&#xD;
+                ajaxActionDel.set(&quot;parameter&quot;, parameter).execute();&#xD;
+			}&#xD;
+		    &#xD;
+		}else{&#xD;
+			dorado.MessageBox.alert(&quot;该记录不能删除！&quot;);&#xD;
+		}&#xD;
+		&#xD;
+       &#xD;
+    })&#xD;
+}</ClientEvent>
+        <Property name="caption">删除并保存</Property>
+        <Property name="icon"> url(>skin>common/icons.gif) -40px -0px</Property>
+      </ToolBarButton>
+      <ToolBarButton id="btnExport">
+        <Property name="caption">导出</Property>
+        <Property name="icon">url(>skin>common/icons.gif) -180px -120px</Property>
+        <Property name="action">export2ReportAction1</Property>
+      </ToolBarButton>
+    </ToolBar>
+    <Container layout="vbox">
+      <DataGrid id="dgStockRecord">
+        <Property name="dataSet">dsPwRecord</Property>
+        <Property name="readOnly">true</Property>
+        <Property name="dataType">dtVWareRecord</Property>
+        <Property name="showFilterBar">false</Property>
+        <Property name="filterMode">serverSide</Property>
+        <DataColumn>
+          <Property name="property">RECORD_ID</Property>
+          <Property name="width">40</Property>
+          <Property name="name">RECORD_ID</Property>
+          <Property name="caption">序号</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">TYPE_NAME</Property>
+          <Property name="caption">种类</Property>
+          <Property name="name">TYPE_NAME</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">BRAND_NAME</Property>
+          <Property name="caption">品牌</Property>
+          <Property name="name">BRAND_NAME</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">CATEGORT</Property>
+          <Property name="caption">类别</Property>
+          <Property name="name">CATEGORT</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">PATTERN_NO</Property>
+          <Property name="name">PATTERN_NO</Property>
+          <Property name="caption">编号</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">GRADES_NAME</Property>
+          <Property name="caption">等级</Property>
+          <Property name="name">GRADES_NAME</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">COLOR</Property>
+          <Property name="caption">色别</Property>
+          <Property name="name">COLOR</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">SPEC_NAME</Property>
+          <Property name="caption">规格</Property>
+          <Property name="name">SPEC_NAME</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">STOCK</Property>
+          <Property name="width">40</Property>
+          <Property name="name">STOCK</Property>
+          <Property name="caption">入库量</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">WAREHOUSE</Property>
+          <Property name="name">WAREHOUSE</Property>
+          <Property name="caption">库位</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">OPT_TYPE</Property>
+          <Property name="name">OPT_TYPE</Property>
+          <Property name="caption">操作</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">CREATER</Property>
+          <Property name="name">CREATER</Property>
+          <Property name="caption">入库员</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">PRODUCED_DATE</Property>
+          <Property name="caption">生产日期</Property>
+          <Property name="name">PRODUCED_DATE</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">CLASSES_NAME</Property>
+          <Property name="caption">班次</Property>
+          <Property name="name">CLASSES_NAME</Property>
+          <Property name="align">center</Property>
+        </DataColumn>
+        <DataColumn name="REMARK">
+          <Property name="property">REMARK</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">备注</Property>
+        </DataColumn>
+      </DataGrid>
+      <Dialog id="dialogAdd">
+        <Property name="caption">添加入库信息</Property>
+        <Property name="width">650</Property>
+        <Property name="height">400</Property>
+        <Buttons>
+          <Button id="dBtnSave">
+            <ClientEvent name="onClick" signature="self,arg,dialogAdd,updateactionSave,dsWhRecordSave,dsWhRecordSave,dsProductSave,afProduct,afWare">afProduct.validate();&#xD;
+afWare.validate();&#xD;
+//在保存操作完成后的回调函数中将编辑弹出框隐藏&#xD;
+updateactionSave.execute(function(){&#xD;
+	dsProductSave.clear();&#xD;
+	dsWhRecordSave.clear();&#xD;
+    dialogAdd.hide();&#xD;
+&#xD;
+})</ClientEvent>
+            <Property name="caption">保存</Property>
+            <Property name="icon">url(>skin>common/icons.gif) -140px -20px</Property>
+          </Button>
+          <Button id="dBtnCancel">
+            <ClientEvent name="onClick" signature="self,arg,dialogAdd">dialogAdd.hide();</ClientEvent>
+            <Property name="caption">取消</Property>
+            <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
+          </Button>
+        </Buttons>
+        <Children>
+          <AutoForm id="afProduct">
+            <Property name="cols">*,*</Property>
+            <Property name="readOnly">false</Property>
+            <Property name="createPrivateDataSet">false</Property>
+            <Property name="dataSet">dsProductSave</Property>
+            <AutoFormElement>
+              <Property name="name">typeName</Property>
+              <Property name="property">typeName</Property>
+              <Property name="trigger">wkgddsdPdtTyp</Property>
+              <Property name="label">种类</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">brandName</Property>
+              <Property name="property">brandName</Property>
+              <Property name="trigger">wkgddsdPdtBra</Property>
+              <Property name="label">品牌</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">categort</Property>
+              <Property name="label">类别</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">patternNo</Property>
+              <Property name="label">编号</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">gradesName</Property>
+              <Property name="trigger">wkgdsddPdtGd</Property>
+              <Property name="label">等级</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">color</Property>
+              <Property name="label">色别</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">specName</Property>
+              <Property name="trigger">wkgdsddPdtSpec</Property>
+              <Property name="label">规格</Property>
+              <Editor/>
+            </AutoFormElement>
+          </AutoForm>
+          <AutoForm id="afWare">
+            <Property name="dataSet">dsWhRecordSave</Property>
+            <AutoFormElement>
+              <Property name="name">warehouse</Property>
+              <Property name="property">warehouse</Property>
+              <Property name="label">库位</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">stock</Property>
+              <Property name="property">stock</Property>
+              <Property name="label">库存</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">producedDate</Property>
+              <Property name="property">producedDate</Property>
+              <Property name="label">生产日期</Property>
+              <Property name="trigger">defaultDateTimeDropDown</Property>
+              <Property name="editable">false</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">classesName</Property>
+              <Property name="property">classesName</Property>
+              <Property name="trigger">wkgdsddClasses</Property>
+              <Property name="label">班次</Property>
+              <Property name="editable">false</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">typeName</Property>
+              <Property name="property">typeName</Property>
+              <Property name="trigger">wkgdsddWhType</Property>
+              <Property name="label">操作类型</Property>
+              <Property name="editable">false</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">remark</Property>
+              <Property name="property">remark</Property>
+              <Property name="label">备注</Property>
+              <Editor/>
+            </AutoFormElement>
+          </AutoForm>
+        </Children>
+        <Tools/>
+      </Dialog>
+      <UpdateAction id="updateactionSave">
+        <ClientEvent name="onGetUpdateData" signature="self,arg,dsProductSave">var warehouse = view.get(&quot;#dsWhRecordSave.data:#.#warehouse&quot;);&#xD;
+var stock = view.get(&quot;#dsWhRecordSave.data:#.#stock&quot;);&#xD;
+var optId = view.get(&quot;#dsWhRecordSave.data:#.#optId&quot;);&#xD;
+var classesId = view.get(&quot;#dsWhRecordSave.data:#.#classesId&quot;);&#xD;
+var data = view.get(&quot;#dsWhRecordSave.data:#.#producedDate&quot;);&#xD;
+var producedDate=data.formatDate(&quot;Y-m-d&quot;);&#xD;
+var remark = view.get(&quot;#dsWhRecordSave.data:#.#remark&quot;);&#xD;
+self.set(&quot;parameter&quot;,{&#xD;
+	&quot;warehouse&quot;:warehouse,&#xD;
+	&quot;stock&quot;:stock,&#xD;
+	&quot;optId&quot;:optId,&#xD;
+	&quot;classesId&quot;:classesId,&#xD;
+	&quot;producedDate&quot;:producedDate,&#xD;
+	&quot;remark&quot;:remark&#xD;
+});</ClientEvent>
+        <ClientEvent name="onFailure"> </ClientEvent>
+        <ClientEvent name="onSuccess" signature="self,arg,dsPwRecord">var info = self.get(&quot;returnValue&quot;);&#xD;
+if(info.result){&#xD;
+	//刷新数据&#xD;
+	dsPwRecord.flush();&#xD;
+	dorado.MessageBox.alert(info.msg);&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(info.msg, {&#xD;
+    icon: &quot;WARNING&quot;&#xD;
+});&#xD;
+}&#xD;
+&#xD;
+ </ClientEvent>
+        <Property name="dataResolver">stockService#saveRecord</Property>
+        <Property name="executingMessage">正在保存。。。</Property>
+        <Property name="hotkey">ctrl+s</Property>
+        <UpdateItem>
+          <Property name="dataSet">dsProductSave</Property>
+        </UpdateItem>
+      </UpdateAction>
+      <AjaxAction id="ajaxActionDel">
+        <ClientEvent name="onSuccess" signature="self,arg,dsPwRecord">var entity = dsPwRecord.get(&quot;data:#&quot;);&#xD;
+&#xD;
+//获取返回值&#xD;
+var result = self.get(&quot;returnValue&quot;);&#xD;
+//根据返回值判断&#xD;
+if(result){&#xD;
+    dorado.MessageBox.alert(&quot;删除成功！&quot;);&#xD;
+	entity.remove();&#xD;
+	//刷新数据&#xD;
+	dsPwRecord.flush();&#xD;
+}else{&#xD;
+    dorado.MessageBox.alert(&quot;删除失败！&quot;,{title:&quot;提示&quot;,icon:&quot;WARNING&quot;});&#xD;
+}</ClientEvent>
+        <Property name="service">stockService#deleteRecord</Property>
+        <Property name="executingMessage">正在删除</Property>
+      </AjaxAction>
+      <Export2ReportAction id="export2ReportAction1">
+        <Property name="fileName">StockRecord</Property>
+        <Property name="extension">xlsx</Property>
+        <Property name="template">dgStockRecord</Property>
+        <Property name="dataScope">serverAll</Property>
+        <Property name="titleName">入库记录表</Property>
+        <Property name="showTitle">true</Property>
+        <Property name="maxSize">5000</Property>
+      </Export2ReportAction>
+      <DataSetDropDown id="wkgddsdPdtTyp">
+        <ClientEvent name="onReady">&#xD;
+&#xD;
+</ClientEvent>
+        <ClientEvent name="onFilterItems">&#xD;
+</ClientEvent>
+        <Property name="dataSet">dsXlyPdtType</Property>
+        <Property name="displayProperty">typeName</Property>
+        <Property name="dynaFilter">false</Property>
+        <Property name="property">typeName</Property>
+        <Property name="editable">false</Property>
+        <Property name="assignmentMap">typeId</Property>
+        <Property name="autoOpen">true</Property>
+        <Property name="useEmptyItem">false</Property>
+      </DataSetDropDown>
+      <DataSetDropDown id="wkgddsdPdtBra">
+        <ClientEvent name="onReady">&#xD;
+</ClientEvent>
+        <Property name="dataSet">dsXlyPdtBra</Property>
+        <Property name="displayProperty">brandName</Property>
+        <Property name="property">brandName</Property>
+        <Property name="assignmentMap">brandId</Property>
+        <Property name="autoOpen">true</Property>
+        <Property name="editable">false</Property>
+        <Property name="useEmptyItem">false</Property>
+      </DataSetDropDown>
+      <DataSetDropDown id="wkgdsddPdtGd">
+        <ClientEvent name="beforeExecute">//var gradesId = view.get(&quot;#dsXlyProduct.data:#.#GRADES_ID&quot;)&#xD;
+//弹出一个对话框  &#xD;
+ //  alert(&quot;gradesId=&quot;+gradesId);  &#xD;
+ //   var dsXlyProductSave = view.get(&quot;#dsXlyProductSave&quot;);&#xD;
+ //   dsXlyProductSave.set(&quot;parameter&quot;,{&#xD;
+ //       &quot;gradesId&quot;: gradesId&#xD;
+  //  });&#xD;
+  //  dsXlyProductSave.flushAsync();</ClientEvent>
+        <Property name="dataSet">dsXlyPdtGd</Property>
+        <Property name="displayProperty">gradesName</Property>
+        <Property name="property">gradesName</Property>
+        <Property name="assignmentMap">gradesId</Property>
+        <Property name="autoOpen">true</Property>
+        <Property name="editable">false</Property>
+        <Property name="useEmptyItem">false</Property>
+      </DataSetDropDown>
+      <DataSetDropDown id="wkgdsddPdtSpec">
+        <ClientEvent name="beforeExecute">//var specId = view.get(&quot;#dsXlyProduct.data:#.#SPEC_ID&quot;)&#xD;
+//    var dsXlyProductSave = view.get(&quot;#dsXlyProductSave&quot;);&#xD;
+//    dsXlyProductSave.set(&quot;parameter&quot;,{&#xD;
+//        &quot;specId&quot;: specId&#xD;
+ //   });&#xD;
+ //   dsXlyProductSave.flushAsync();</ClientEvent>
+        <ClientEvent name="onReady">&#xD;
+</ClientEvent>
+        <Property name="dataSet">dsXlyPdtSpec</Property>
+        <Property name="displayProperty">specName</Property>
+        <Property name="property">specName</Property>
+        <Property name="assignmentMap">specId</Property>
+        <Property name="autoOpen">true</Property>
+        <Property name="editable">false</Property>
+        <Property name="useEmptyItem">false</Property>
+      </DataSetDropDown>
+      <DataSetDropDown id="wkgdsddWhType">
+        <Property name="dataSet">dsWhType</Property>
+        <Property name="displayProperty">typeName</Property>
+        <Property name="dynaFilter">false</Property>
+        <Property name="property">typeName</Property>
+        <Property name="editable">false</Property>
+        <Property name="assignmentMap">optId=typeId</Property>
+        <Property name="autoOpen">true</Property>
+        <Property name="useEmptyItem">false</Property>
+      </DataSetDropDown>
+      <DataSetDropDown id="wkgdsddClasses">
+        <Property name="dataSet">dsClasses</Property>
+        <Property name="displayProperty">classesName</Property>
+        <Property name="dynaFilter">false</Property>
+        <Property name="property">classesName</Property>
+        <Property name="editable">false</Property>
+        <Property name="assignmentMap">classesId</Property>
+        <Property name="autoOpen">true</Property>
+        <Property name="useEmptyItem">false</Property>
+      </DataSetDropDown>
+    </Container>
+    <Dialog id="dialogEdit">
+      <Property name="caption">修改信息</Property>
+      <Property name="width">650</Property>
+      <Property name="height">400</Property>
+      <Property name="closeAction">hide</Property>
+      <Buttons>
+        <Button id="wBtnSave">
+          <ClientEvent name="onClick" signature="self,arg,dialogEdit,updateactionEdit,updateactionEdit,dsPwRecord">//在保存操作完成后的回调函数中将编辑弹出框隐藏&#xD;
+updateactionEdit.execute(function(){&#xD;
+	dsPwRecord.flush();&#xD;
+    dialogEdit.hide();&#xD;
+&#xD;
+})</ClientEvent>
+          <Property name="caption">保存</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -140px -20px</Property>
+        </Button>
+        <Button id="wBtnCancel">
+          <ClientEvent name="onClick" signature="self,arg,dialogEdit">&#xD;
+dialogEdit.hide();</ClientEvent>
+          <Property name="caption">取消</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
+        </Button>
+      </Buttons>
+      <Children>
+        <AutoForm id="afWh">
+          <Property name="cols">*,*</Property>
+          <Property name="readOnly">false</Property>
+          <Property name="createPrivateDataSet">true</Property>
+          <Property name="dataSet">dsPwRecord</Property>
+          <AutoFormElement>
+            <Property name="name">TYPE_NAME</Property>
+            <Property name="property">TYPE_NAME</Property>
+            <Property name="label">种类</Property>
+            <Property name="trigger">ddPdtTyp</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">BRAND_NAME</Property>
+            <Property name="property">BRAND_NAME</Property>
+            <Property name="label">品牌</Property>
+            <Property name="trigger">ddPdtBra</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">CATEGORT</Property>
+            <Property name="property">CATEGORT</Property>
+            <Property name="label">类别</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">PATTERN_NO</Property>
+            <Property name="property">PATTERN_NO</Property>
+            <Property name="label">编号</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">GRADES_NAME</Property>
+            <Property name="property">GRADES_NAME</Property>
+            <Property name="label">等级</Property>
+            <Property name="trigger">ddPdtGd</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">COLOR</Property>
+            <Property name="property">COLOR</Property>
+            <Property name="label">色别</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">SPEC_NAME</Property>
+            <Property name="property">SPEC_NAME</Property>
+            <Property name="label">规格</Property>
+            <Property name="trigger">ddPdtSpec</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">WAREHOUSE</Property>
+            <Property name="property">WAREHOUSE</Property>
+            <Property name="label">库位</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">STOCK</Property>
+            <Property name="property">STOCK</Property>
+            <Property name="label">库存</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">PRODUCED_DATE</Property>
+            <Property name="property">PRODUCED_DATE</Property>
+            <Property name="label">生产日期</Property>
+            <Property name="trigger">defaultDateTimeDropDown</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">CLASSES_NAME</Property>
+            <Property name="property">CLASSES_NAME</Property>
+            <Property name="label">班次</Property>
+            <Property name="trigger">ddClasses</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">OPT_TYPE</Property>
+            <Property name="property">OPT_TYPE</Property>
+            <Property name="label">操作类型</Property>
+            <Property name="trigger">ddWhType</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">REMARK</Property>
+            <Property name="property">REMARK</Property>
+            <Property name="label">备注</Property>
+            <Editor/>
+          </AutoFormElement>
+        </AutoForm>
+      </Children>
+      <Tools/>
+    </Dialog>
+    <UpdateAction id="updateactionEdit">
+      <ClientEvent name="onFailure"> </ClientEvent>
+      <ClientEvent name="onSuccess">var info = self.get(&quot;returnValue&quot;);&#xD;
+&#xD;
+if(info.result){&#xD;
+	dorado.MessageBox.alert(info.msg);&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(info.msg, {&#xD;
+    icon: &quot;WARNING&quot;&#xD;
+});&#xD;
+}</ClientEvent>
+      <Property name="dataResolver">stockService#modifyWarerecord</Property>
+      <Property name="executingMessage">正在保存。。。</Property>
+      <Property name="hotkey">ctrl+s</Property>
+      <UpdateItem>
+        <Property name="dataSet">dsPwRecord</Property>
+      </UpdateItem>
+    </UpdateAction>
+    <DataSetDropDown id="ddPdtTyp">
+      <ClientEvent name="onReady">&#xD;
+&#xD;
+</ClientEvent>
+      <ClientEvent name="onFilterItems">&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsXlyPdtType</Property>
+      <Property name="displayProperty">typeName</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">typeName</Property>
+      <Property name="editable">false</Property>
+      <Property name="assignmentMap">TYPE_ID=typeId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="useEmptyItem">false</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="ddPdtBra">
+      <ClientEvent name="onReady">&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsXlyPdtBra</Property>
+      <Property name="displayProperty">brandName</Property>
+      <Property name="property">brandName</Property>
+      <Property name="assignmentMap">BRAND_ID=brandId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">false</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="ddPdtGd">
+      <Property name="dataSet">dsXlyPdtGd</Property>
+      <Property name="displayProperty">gradesName</Property>
+      <Property name="property">gradesName</Property>
+      <Property name="assignmentMap">GRADES_ID=gradesId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">false</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="ddPdtSpec">
+      <ClientEvent name="beforeExecute">//var specId = view.get(&quot;#dsXlyProduct.data:#.#SPEC_ID&quot;)&#xD;
+//    var dsXlyProductSave = view.get(&quot;#dsXlyProductSave&quot;);&#xD;
+//    dsXlyProductSave.set(&quot;parameter&quot;,{&#xD;
+//        &quot;specId&quot;: specId&#xD;
+ //   });&#xD;
+ //   dsXlyProductSave.flushAsync();</ClientEvent>
+      <ClientEvent name="onReady">&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsXlyPdtSpec</Property>
+      <Property name="displayProperty">specName</Property>
+      <Property name="property">specName</Property>
+      <Property name="assignmentMap">SPEC_ID=specId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">false</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="ddWhType">
+      <Property name="dataSet">dsWhType</Property>
+      <Property name="displayProperty">typeName</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">typeName</Property>
+      <Property name="editable">false</Property>
+      <Property name="assignmentMap">OPT_ID=typeId</Property>
+      <Property name="autoOpen">true</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="ddClasses">
+      <Property name="dataSet">dsClasses</Property>
+      <Property name="displayProperty">classesName</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">classesName</Property>
+      <Property name="editable">false</Property>
+      <Property name="assignmentMap">CLASSES_ID=classesId</Property>
+      <Property name="autoOpen">true</Property>
+    </DataSetDropDown>
+  </View>
+</ViewConfig>

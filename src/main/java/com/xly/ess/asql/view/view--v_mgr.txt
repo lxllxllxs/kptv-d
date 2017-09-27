@@ -1,0 +1,17 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_mgr`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_mgr` AS 
+SELECT
+  `up`.`POSITION_ID_`   AS `positionId`,
+  `up`.`SALES_MGR_ID`   AS `salesMgrId`,
+  `up`.`SALES_MGR_NAME` AS `salesMgrName`
+FROM (`bdf2_user` `u`
+   JOIN `bdf2_user_position` `up`)
+WHERE ((`u`.`USERNAME_` = `up`.`USERNAME_`)
+       AND (`up`.`POSITION_ID_` = '1'))$$
+
+DELIMITER ;

@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="dtXlyMat3" parent="dtMat3">
+      <PropertyDef name="matName">
+        <Property name="required">true</Property>
+        <Property name="submittable">true</Property>
+      </PropertyDef>
+      <PropertyDef name="mat2Name">
+        <Property name="required">true</Property>
+        <Property name="submittable">true</Property>
+      </PropertyDef>
+    </DataType>
+  </Model>
+  <View>
+    <DataSet id="dsMat1">
+      <Property name="dataType">[dtMat]</Property>
+      <Property name="dataProvider">matService#getAllMat</Property>
+    </DataSet>
+    <DataSet id="dsMat2">
+      <Property name="dataType">[dtMat2]</Property>
+      <Property name="dataProvider">matService#getAllMat2</Property>
+    </DataSet>
+    <DataSet id="dsMat3">
+      <Property name="dataType">[dtXlyMat3]</Property>
+      <Property name="dataProvider">matService#getAllMat3</Property>
+      <Property name="pageSize">40</Property>
+    </DataSet>
+    <DataSet id="dsMat1ToMat2">
+      <ClientEvent name="beforeLoadData" signature="self,arg,dsMat1">&#xD;
+var matId = view.get(&quot;#dsMat1.data:#.#matId&quot;);&#xD;
+&#xD;
+self.set(&quot;parameter&quot;,{&#xD;
+	&quot;matId&quot;:matId&#xD;
+});&#xD;
+</ClientEvent>
+      <Property name="dataType">[dtMat2]</Property>
+      <Property name="dataProvider">matService#getMat1ToMat2</Property>
+    </DataSet>
+    <DataSet id="dsMat3Save">
+      <Property name="dataType">dtXlyMat3</Property>
+    </DataSet>
+    <DataSetDropDown id="dsddMat1">
+      <Property name="dataSet">dsMat1</Property>
+      <Property name="property">matName</Property>
+      <Property name="displayProperty">matName</Property>
+      <Property name="useEmptyItem">true</Property>
+      <Property name="assignmentMap">matId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddMat2">
+      <Property name="property">mat2Name</Property>
+      <Property name="displayProperty">mat2Name</Property>
+      <Property name="dataSet">dsMat2</Property>
+      <Property name="assignmentMap">mat2Id</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <AutoForm id="afMat">
+      <Property name="cols">*,*,*,*</Property>
+      <Property name="createPrivateDataSet">true</Property>
+      <Property name="labelSeparator">:</Property>
+      <AutoFormElement>
+        <Property name="name">matName</Property>
+        <Property name="property">matName</Property>
+        <Property name="label">组名</Property>
+        <Property name="trigger">dsddMat1</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">mat2Name</Property>
+        <Property name="property">mat2Name</Property>
+        <Property name="label">类别</Property>
+        <Property name="trigger">dsddMat2</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">mat3Name</Property>
+        <Property name="property">mat3Name</Property>
+        <Property name="label">品名</Property>
+        <Editor/>
+      </AutoFormElement>
+    </AutoForm>
+    <ToolBar>
+      <DataPilot>
+        <Property name="dataSet">dsMat3</Property>
+        <Property name="itemCodes">pages,pageSize</Property>
+      </DataPilot>
+      <ToolBarButton id="btnQuery">
+        <ClientEvent name="onClick" signature="self,arg,afMat,dsMat3">//获取afCondition绑定的实体对象&#xD;
+var entity = afMat.get(&quot;entity&quot;);&#xD;
+//将实体对象作为参数传入，并异步刷新&#xD;
+dsMat3.set(&quot;parameter&quot;,entity).flushAsync();</ClientEvent>
+        <Property name="caption">查询</Property>
+        <Property name="icon"> url(>skin>common/icons.gif) -20px -40px</Property>
+      </ToolBarButton>
+      <ToolBarButton id="btnAdd">
+        <ClientEvent name="onClick" signature="self,arg,dialogAdd,dsMat3,dsMat3Save">var mat3Name = view.get(&quot;#dsMat3.data:#.#mat3Name&quot;);&#xD;
+var unit = view.get(&quot;#dsMat3.data:#.#unit&quot;);&#xD;
+var mat2Id = view.get(&quot;#dsMat3.data:#.#mat2Id&quot;);&#xD;
+var matId = view.get(&quot;#dsMat3.data:#.#matId&quot;);&#xD;
+var matName = view.get(&quot;#dsMat3.data:#.#matName&quot;);&#xD;
+var mat2Name = view.get(&quot;#dsMat3.data:#.#mat2Name&quot;);&#xD;
+&#xD;
+//设置弹框中下拉的默认值&#xD;
+dsMat3Save.setData({&#xD;
+	$dataType : &quot;dsMat3Save&quot;,&#xD;
+	mat3Name : mat3Name,&#xD;
+	unit : unit,&#xD;
+	mat2Id : mat2Id,&#xD;
+	matId : matId,&#xD;
+	matName : matName,&#xD;
+	mat2Name : mat2Name&#xD;
+}&#xD;
+);&#xD;
+dialogAdd.show();&#xD;
+</ClientEvent>
+        <Property name="caption">新增</Property>
+        <Property name="icon"> url(>skin>common/icons.gif) -120px -0px</Property>
+      </ToolBarButton>
+      <ToolBarButton id="btnEdit">
+        <ClientEvent name="onClick" signature="self,arg,dialogEdit,dsMat3,dsMat3Save">var mat3Id = view.get(&quot;#dsMat3.data:#.#mat3Id&quot;);&#xD;
+var mat3Name = view.get(&quot;#dsMat3.data:#.#mat3Name&quot;);&#xD;
+var unit = view.get(&quot;#dsMat3.data:#.#unit&quot;);&#xD;
+var mat2Id = view.get(&quot;#dsMat3.data:#.#mat2Id&quot;);&#xD;
+var matId = view.get(&quot;#dsMat3.data:#.#matId&quot;);&#xD;
+var matName = view.get(&quot;#dsMat3.data:#.#matName&quot;);&#xD;
+var mat2Name = view.get(&quot;#dsMat3.data:#.#mat2Name&quot;);&#xD;
+&#xD;
+//设置弹框中下拉的默认值&#xD;
+dsMat3Save.setData({&#xD;
+	$dataType : &quot;dsMat3Save&quot;,&#xD;
+	mat3Id : mat3Id,&#xD;
+	mat3Name : mat3Name,&#xD;
+	unit : unit,&#xD;
+	mat2Id : mat2Id,&#xD;
+	matId : matId,&#xD;
+	matName : matName,&#xD;
+	mat2Name : mat2Name&#xD;
+}&#xD;
+);&#xD;
+dialogEdit.show();</ClientEvent>
+        <Property name="caption">修改</Property>
+        <Property name="icon"> url(>skin>common/icons.gif) -200px -0px</Property>
+      </ToolBarButton>
+    </ToolBar>
+    <DataGrid id="dgMat">
+      <Property name="dataSet">dsMat3</Property>
+      <Property name="readOnly">true</Property>
+      <DataColumn name="matName">
+        <Property name="property">matName</Property>
+        <Property name="caption">组名</Property>
+        <Property name="align">center</Property>
+      </DataColumn>
+      <DataColumn>
+        <Property name="property">mat2Name</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">类别</Property>
+        <Property name="name">mat2Name</Property>
+      </DataColumn>
+      <DataColumn>
+        <Property name="property">mat3Name</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">品名</Property>
+        <Property name="name">mat3Name</Property>
+      </DataColumn>
+      <DataColumn name="unit">
+        <Property name="property">unit</Property>
+        <Property name="caption">单位</Property>
+        <Property name="align">center</Property>
+      </DataColumn>
+    </DataGrid>
+    <Dialog id="dialogAdd">
+      <Property name="height">200</Property>
+      <Property name="width">500</Property>
+      <Property name="caption">添加目录信息</Property>
+      <Buttons>
+        <Button id="btnSave">
+          <ClientEvent name="onClick" signature="self,arg,dialogAdd,updateactionSave,dsMat3">//在保存操作完成后的回调函数中将编辑弹出框隐藏&#xD;
+updateactionSave.execute(function(){&#xD;
+	dsMat3.flush();&#xD;
+    dialogAdd.hide();&#xD;
+&#xD;
+})</ClientEvent>
+          <Property name="caption">保存</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -140px -20px</Property>
+        </Button>
+        <Button id="btnCancel">
+          <ClientEvent name="onClick" signature="self,arg,dialogAdd">&#xD;
+dialogAdd.hide();</ClientEvent>
+          <Property name="caption">取消</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
+        </Button>
+      </Buttons>
+      <Children>
+        <AutoForm>
+          <Property name="dataSet">dsMat3Save</Property>
+          <Property name="labelSpacing">:</Property>
+          <AutoFormElement>
+            <Property name="name">matName</Property>
+            <Property name="property">matName</Property>
+            <Property name="label">组名</Property>
+            <Property name="trigger">wkgdsddMat1</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">mat2Name</Property>
+            <Property name="property">mat2Name</Property>
+            <Property name="label">类别</Property>
+            <Property name="trigger">wkgdsddMat2</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">mat3Name</Property>
+            <Property name="property">mat3Name</Property>
+            <Property name="label">品名</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">unit</Property>
+            <Property name="property">unit</Property>
+            <Property name="label">单位</Property>
+            <Editor/>
+          </AutoFormElement>
+        </AutoForm>
+      </Children>
+      <Tools/>
+    </Dialog>
+    <DataSetDropDown id="wkgdsddMat1">
+      <Property name="dataSet">dsMat1</Property>
+      <Property name="property">matName</Property>
+      <Property name="displayProperty">matName</Property>
+      <Property name="assignmentMap">matId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="wkgdsddMat2">
+      <Property name="property">mat2Name</Property>
+      <Property name="displayProperty">mat2Name</Property>
+      <Property name="dataSet">dsMat1ToMat2</Property>
+      <Property name="assignmentMap">mat2Id</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="reloadDataOnOpen">true</Property>
+    </DataSetDropDown>
+    <UpdateAction id="updateactionSave">
+      <ClientEvent name="onFailure"> </ClientEvent>
+      <ClientEvent name="onSuccess">var info = self.get(&quot;returnValue&quot;);&#xD;
+if(info){&#xD;
+	//dorado.MessageBox.alert(&quot;新增成功！&quot;);&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(&quot;新增失败！&quot;, {&#xD;
+    icon: &quot;WARNING&quot;&#xD;
+});&#xD;
+}&#xD;
+&#xD;
+ </ClientEvent>
+      <Property name="dataResolver">matService#addMat3</Property>
+      <Property name="executingMessage">正在保存。。。</Property>
+      <Property name="hotkey">ctrl+s</Property>
+      <UpdateItem>
+        <Property name="dataSet">dsMat3Save</Property>
+      </UpdateItem>
+    </UpdateAction>
+    <Dialog id="dialogEdit">
+      <Property name="caption">修改信息</Property>
+      <Property name="width">500</Property>
+      <Property name="height">200</Property>
+      <Property name="closeAction">hide</Property>
+      <Buttons>
+        <Button id="wBtnSave">
+          <ClientEvent name="onClick" signature="self,arg,dialogEdit,updateactionEdit,dsMat3">//在保存操作完成后的回调函数中将编辑弹出框隐藏&#xD;
+updateactionEdit.execute(function(){&#xD;
+	dsMat3.flush();&#xD;
+    dialogEdit.hide();&#xD;
+&#xD;
+})</ClientEvent>
+          <Property name="caption">保存</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -140px -20px</Property>
+        </Button>
+        <Button id="wBtnCancel">
+          <ClientEvent name="onClick" signature="self,arg,dialogEdit">&#xD;
+dialogEdit.hide();</ClientEvent>
+          <Property name="caption">取消</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
+        </Button>
+      </Buttons>
+      <Children>
+        <AutoForm id="afWh">
+          <Property name="cols">*,*</Property>
+          <Property name="readOnly">false</Property>
+          <Property name="createPrivateDataSet">true</Property>
+          <Property name="dataSet">dsMat3Save</Property>
+          <AutoFormElement>
+            <Property name="name">matName</Property>
+            <Property name="property">matName</Property>
+            <Property name="trigger">wkgdsddMat1</Property>
+            <Property name="label">组名</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">mat2Name</Property>
+            <Property name="property">mat2Name</Property>
+            <Property name="trigger">wkgdsddMat2</Property>
+            <Property name="label">类别</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">mat3Name</Property>
+            <Property name="property">mat3Name</Property>
+            <Property name="label">品名</Property>
+            <Editor/>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">unit</Property>
+            <Property name="property">unit</Property>
+            <Property name="label">单位</Property>
+            <Editor/>
+          </AutoFormElement>
+        </AutoForm>
+      </Children>
+      <Tools/>
+    </Dialog>
+    <UpdateAction id="updateactionEdit">
+      <ClientEvent name="onFailure"> </ClientEvent>
+      <ClientEvent name="onSuccess">var info = self.get(&quot;returnValue&quot;);&#xD;
+&#xD;
+if(info){&#xD;
+	//dorado.MessageBox.alert(&quot;修改成功！&quot;);&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(&quot;修改失败！&quot;, {&#xD;
+    icon: &quot;WARNING&quot;&#xD;
+});&#xD;
+}</ClientEvent>
+      <Property name="dataResolver">matService#updateMat3</Property>
+      <Property name="executingMessage">正在保存。。。</Property>
+      <Property name="hotkey">ctrl+s</Property>
+      <UpdateItem>
+        <Property name="dataSet">dsMat3Save</Property>
+        <Property name="dataPath">!DIRTY_TREE</Property>
+      </UpdateItem>
+    </UpdateAction>
+  </View>
+</ViewConfig>

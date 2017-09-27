@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="dtXlyBalRecord" parent="dtBalRecord">
+      <Property name="acceptValidationState">warn</Property>
+      <PropertyDef name="ctmName">
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="amount">
+        <Property name="required">true</Property>
+        <Validator name="validator1" type="range">
+          <Property name="minValue">0</Property>
+          <Property name="runAt">client</Property>
+          <Property name="maxValue">10000000000</Property>
+          <Property name="resultMessage">金额必须大于0</Property>
+          <Property name="minValueValidateMode">notAllowEquals</Property>
+        </Validator>
+      </PropertyDef>
+      <PropertyDef name="address"/>
+      <PropertyDef name="ca"/>
+      <PropertyDef name="salesMgrName"/>
+    </DataType>
+    <DataType name="dtCtm" parent="dtCustomer">
+      <PropertyDef name="ca"/>
+    </DataType>
+    <DataType name="dataType3">
+      <PropertyDef name="total">
+        <Property name="label">total</Property>
+        <Property name="displayFormat">#,##0.00元</Property>
+        <Property name="dataType">double</Property>
+      </PropertyDef>
+    </DataType>
+  </Model>
+  <View>
+    <DataSet id="dsTotal">
+      <ClientEvent name="onCreate">self.insert({&#xD;
+	$dataType: &quot;dsTotal&quot;,&#xD;
+	total : 0&#xD;
+});</ClientEvent>
+      <Property name="dataType">dataType3</Property>
+    </DataSet>
+    <DataSet id="dsXlyBalRecord">
+      <ClientEvent name="onLoadData" signature="self,arg,dsXlyBalRecord,dsTotal">var total=0.0;&#xD;
+        var entityList =dsXlyBalRecord.getData();&#xD;
+        entityList.each(function(entity){&#xD;
+             var subTotal = entity.get(&quot;amount&quot;);&#xD;
+             total+=subTotal;&#xD;
+        });&#xD;
+		&#xD;
+        //设置DS的值&#xD;
+        dsTotal.getData().set(&quot;total&quot;,total);&#xD;
+		//显示合计&#xD;
+		view.get(&quot;#afTotal&quot;).refresh();</ClientEvent>
+      <Property name="dataType">[dtXlyBalRecord]</Property>
+      <Property name="dataProvider">customerService#getVBalRecord</Property>
+      <Property name="pageSize">40</Property>
+    </DataSet>
+    <DataSet id="dsMgr">
+      <Property name="dataType">[dtBdf2UserPosition]</Property>
+      <Property name="dataProvider">customerService#getAllMgr</Property>
+    </DataSet>
+    <DataSet id="dsDialogCtm">
+      <ClientEvent name="beforeLoadData" signature="self,arg,afBalRecord">var entity = afBalRecord.get(&quot;entity&quot;);&#xD;
+var salesMgrId =entity.get(&quot;salesMgrId&quot;);&#xD;
+&#xD;
+// 将参数拼装成JSON形式&#xD;
+      var parameter = { &#xD;
+        salesMgrId: salesMgrId             &#xD;
+      };&#xD;
+      // 调用AjaxAction&#xD;
+self.set(&quot;parameter&quot;, parameter)&#xD;
+</ClientEvent>
+      <Property name="dataType">[dtCtm]</Property>
+      <Property name="dataProvider">customerService#getCtmByNameSimple</Property>
+    </DataSet>
+    <Container>
+      <AutoForm id="afCondition">
+        <Property name="createPrivateDataSet">true</Property>
+        <Property name="cols">*,*,*,*,*,*</Property>
+        <Property name="labelSeparator">：</Property>
+        <Property name="labelAlign">center</Property>
+        <Property name="labelSpacing">1</Property>
+        <AutoFormElement>
+          <Property name="name">ctmName</Property>
+          <Property name="label">客户</Property>
+          <Property name="editable">true</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">creater</Property>
+          <Property name="label">操作者</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">optType</Property>
+          <Property name="label">操作类型</Property>
+          <Property name="trigger">lddOptType</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">createTime</Property>
+          <Property name="label">操作时间</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">collectionType</Property>
+          <Property name="label">收款方式</Property>
+          <Property name="trigger">lddCollectionType</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">remark</Property>
+          <Property name="label">备注</Property>
+          <Editor/>
+        </AutoFormElement>
+      </AutoForm>
+      <AutoForm id="afTotal">
+        <Property name="labelSeparator">：</Property>
+        <Property name="dataSet">dsTotal</Property>
+        <Property name="cols">*,*,*,*,*</Property>
+        <Property name="style">
+          <Property name="color">#e22018</Property>
+        </Property>
+        <AutoFormElement>
+          <Property name="name">total</Property>
+          <Property name="property">total</Property>
+          <Property name="label">总金额</Property>
+          <Property name="editorType">Label</Property>
+          <Editor/>
+        </AutoFormElement>
+      </AutoForm>
+      <ListDropDown id="lddOptType">
+        <Property name="items">,入账,增加,减少</Property>
+        <Property name="useEmptyItem">false</Property>
+      </ListDropDown>
+      <ListDropDown id="lddCollectionType">
+        <Property name="items">现金,工行,农行,转账</Property>
+        <Property name="useEmptyItem">false</Property>
+      </ListDropDown>
+      <ToolBar>
+        <DataPilot>
+          <Property name="itemCodes">pages,pageSize</Property>
+          <Property name="dataSet">dsXlyBalRecord</Property>
+        </DataPilot>
+        <ToolBarButton id="btnQuery">
+          <ClientEvent name="onClick" signature="self,arg,afCondition,dsXlyBalRecord">//获取afCondition绑定的实体对象&#xD;
+var entity = afCondition.get(&quot;entity&quot;);&#xD;
+//将实体对象作为参数传入，并异步刷新&#xD;
+dsXlyBalRecord.set(&quot;parameter&quot;,entity).flushAsync();</ClientEvent>
+          <Property name="caption">查询</Property>
+          <Property name="icon"> url(>skin>common/icons.gif) -20px -40px</Property>
+        </ToolBarButton>
+        <ToolBarButton id="btnAdd">
+          <ClientEvent name="onClick" signature="self,arg,dialogAdd,dsXlyBalRecord">dsXlyBalRecord.insert({&#xD;
+	$dataType : &quot;dsXlyBalRecord&quot;,&#xD;
+	optType : &quot;增加&quot;,&#xD;
+	collectionType : &quot;转账&quot;&#xD;
+}&#xD;
+);&#xD;
+dialogAdd.show();</ClientEvent>
+          <Property name="caption">增加</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -120px -0px</Property>
+        </ToolBarButton>
+        <ToolBarButton id="btnReduce">
+          <ClientEvent name="onClick" signature="self,arg,dialogAdd,dsXlyBalRecord">dsXlyBalRecord.insert({&#xD;
+	$dataType : &quot;dsXlyBalRecord&quot;,&#xD;
+	optType : &quot;减少&quot;,&#xD;
+	collectionType : &quot;转账&quot;&#xD;
+}&#xD;
+);&#xD;
+dialogAdd.show();</ClientEvent>
+          <Property name="caption">减少</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -140px -0px</Property>
+        </ToolBarButton>
+        <ToolBarButton id="btnDel">
+          <ClientEvent name="onClick" signature="self,arg,ajaxActionDel,dsXlyBalRecord">var entity = dsXlyBalRecord.get(&quot;data:#&quot;);&#xD;
+var balId = view.get(&quot;#dsXlyBalRecord.data:#.#balId&quot;);&#xD;
+var ctmId = view.get(&quot;#dsXlyBalRecord.data:#.#ctmId&quot;);&#xD;
+var amount = view.get(&quot;#dsXlyBalRecord.data:#.#amount&quot;);&#xD;
+var optType = view.get(&quot;#dsXlyBalRecord.data:#.#optType&quot;);&#xD;
+var createTime = view.get(&quot;#dsXlyBalRecord.data:#.#createTime&quot;);&#xD;
+var collectionType = view.get(&quot;#dsXlyBalRecord.data:#.#collectionType&quot;);&#xD;
+if(entity){&#xD;
+    dorado.MessageBox.confirm(&quot;确认要删除记录吗？&quot;, function(){&#xD;
+		var date = new Date();&#xD;
+		var strdate = date.formatDate(&quot;Y-m-d&quot;);&#xD;
+        &#xD;
+		var cDate = createTime.substring(0,10);&#xD;
+		if(strdate == cDate){&#xD;
+			 &#xD;
+			  if(collectionType == &quot;转账&quot;){&#xD;
+			 	&#xD;
+				// 将参数拼装成JSON形式&#xD;
+                var parameter = {&#xD;
+                    balId: balId,&#xD;
+				    ctmId: ctmId,&#xD;
+                    amount: amount,&#xD;
+				    optType: optType&#xD;
+                };&#xD;
+               // 调用AjaxAction&#xD;
+                ajaxActionDel.set(&quot;parameter&quot;, parameter).execute();&#xD;
+			 }else{&#xD;
+			 	dorado.MessageBox.alert(&quot;亲，你只有删除转账记录的权限！&quot;);&#xD;
+			 }&#xD;
+		    &#xD;
+		}else{&#xD;
+			dorado.MessageBox.alert(&quot;只能删除当天记录！&quot;);&#xD;
+		}&#xD;
+&#xD;
+    })&#xD;
+}</ClientEvent>
+          <Property name="caption">删除并保存</Property>
+          <Property name="icon"> url(>skin>common/icons.gif) -40px -0px</Property>
+          <Property name="action">ajaxActionDel</Property>
+        </ToolBarButton>
+        <ToolBarButton id="btnExport">
+          <Property name="caption">导出</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -120px</Property>
+          <Property name="action">export2ReportAction1</Property>
+        </ToolBarButton>
+      </ToolBar>
+      <DataGrid id="dgBalRecord">
+        <Property name="dataSet">dsXlyBalRecord</Property>
+        <Property name="readOnly">true</Property>
+        <DataColumn name="ctmName">
+          <Property name="property">ctmName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">客户姓名</Property>
+        </DataColumn>
+        <DataColumn name="address">
+          <Property name="property">address</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">地址</Property>
+        </DataColumn>
+        <DataColumn name="salesMgrName">
+          <Property name="property">salesMgrName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">销售经理</Property>
+        </DataColumn>
+        <DataColumn name="amount">
+          <Property name="property">amount</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">金额(元)</Property>
+          <Property name="displayFormat">#,##0.00</Property>
+          <Property name="dataType">double</Property>
+        </DataColumn>
+        <DataColumn name="optType">
+          <Property name="property">optType</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">操作类型</Property>
+        </DataColumn>
+        <DataColumn name="creater">
+          <Property name="property">creater</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">操作者</Property>
+        </DataColumn>
+        <DataColumn name="createTime">
+          <Property name="property">createTime</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">操作时间</Property>
+        </DataColumn>
+        <DataColumn name="collectionType">
+          <Property name="property">collectionType</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">收款方式</Property>
+        </DataColumn>
+        <DataColumn name="remark">
+          <Property name="property">remark</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">备注</Property>
+        </DataColumn>
+      </DataGrid>
+      <Dialog id="dialogAdd">
+        <ClientEvent name="onHide" signature="self,arg,dsXlyBalRecord">dsXlyBalRecord.get(&quot;data:#&quot;).cancel();</ClientEvent>
+        <Property name="caption">添加信息</Property>
+        <Property name="width">650</Property>
+        <Property name="height">250</Property>
+        <Property name="closeAction">hide</Property>
+        <Buttons>
+          <Button id="dBtnSave">
+            <ClientEvent name="onClick" signature="self,arg,dialogAdd,updateactionSave,dsXlyBalRecord">var afBalRecord = view.get(&quot;#afBalRecord.entity&quot;);&#xD;
+var ctmId   = afBalRecord.get(&quot;ctmId&quot;);&#xD;
+&#xD;
+var a=1;&#xD;
+if(ctmId==null || ctmId&lt;=0 ){&#xD;
+	dorado.MessageBox.alert(&quot;请选择客户！&quot;);&#xD;
+	a=0;&#xD;
+}&#xD;
+if(a==1){&#xD;
+	//在保存操作完成后的回调函数中将编辑弹出框隐藏&#xD;
+    updateactionSave.execute(function(){&#xD;
+    dialogAdd.hide();&#xD;
+})&#xD;
+}&#xD;
+</ClientEvent>
+            <Property name="caption">保存</Property>
+            <Property name="icon">url(>skin>common/icons.gif) -140px -20px</Property>
+          </Button>
+          <Button id="dBtnCancel">
+            <ClientEvent name="onClick" signature="self,arg,dialogAdd,dsXlyBalRecord">dsXlyBalRecord.get(&quot;data:#&quot;).cancel();&#xD;
+dialogAdd.hide();</ClientEvent>
+            <Property name="caption">取消</Property>
+            <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
+          </Button>
+        </Buttons>
+        <Children>
+          <AutoForm id="afBalRecord">
+            <Property name="cols">*,*</Property>
+            <Property name="readOnly">false</Property>
+            <Property name="createPrivateDataSet">false</Property>
+            <Property name="dataSet">dsXlyBalRecord</Property>
+            <Property name="labelWidth">70</Property>
+            <Property name="labelSeparator">:</Property>
+            <AutoFormElement>
+              <Property name="name">salesMgrName</Property>
+              <Property name="label">销售经理</Property>
+              <Property name="trigger">dsddMgr</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">ctmName</Property>
+              <Property name="property">ctmName</Property>
+              <Property name="label">客户</Property>
+              <Property name="trigger">dsddDialogCtm</Property>
+              <Property name="editable">true</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">amount</Property>
+              <Property name="property">amount</Property>
+              <Property name="label">金额</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">optType</Property>
+              <Property name="property">optType</Property>
+              <Property name="label">操作类型</Property>
+              <Property name="editable">false</Property>
+              <Property name="editorType">Label</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">collectionType</Property>
+              <Property name="label">收款方式</Property>
+              <Property name="property">collectionType</Property>
+              <Property name="editable">false</Property>
+              <Property name="editorType">Label</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">remark</Property>
+              <Property name="property">remark</Property>
+              <Property name="label">备注</Property>
+              <Editor/>
+            </AutoFormElement>
+          </AutoForm>
+        </Children>
+        <Tools/>
+      </Dialog>
+      <UpdateAction id="updateactionSave">
+        <ClientEvent name="onFailure"> </ClientEvent>
+        <ClientEvent name="onSuccess" signature="self,arg,dsXlyBalRecord">var info = self.get(&quot;returnValue&quot;);&#xD;
+    //刷新数据&#xD;
+	dsXlyBalRecord.flush();&#xD;
+if(info.result){&#xD;
+	&#xD;
+	dorado.MessageBox.alert(info.msg);&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(info.msg, {&#xD;
+    icon: &quot;WARNING&quot;&#xD;
+});&#xD;
+}</ClientEvent>
+        <Property name="dataResolver">customerService#saveBalRecord</Property>
+        <Property name="executingMessage">正在保存。。。</Property>
+        <Property name="hotkey">ctrl+s</Property>
+        <UpdateItem>
+          <Property name="dataSet">dsXlyBalRecord</Property>
+        </UpdateItem>
+      </UpdateAction>
+      <AjaxAction id="ajaxActionDel">
+        <ClientEvent name="onSuccess" signature="self,arg,dsXlyBalRecord">var entity = dsXlyBalRecord.get(&quot;data:#&quot;);&#xD;
+&#xD;
+//获取返回值&#xD;
+var result = self.get(&quot;returnValue&quot;);&#xD;
+//根据返回值判断&#xD;
+if(result){&#xD;
+    dorado.MessageBox.alert(&quot;删除成功！&quot;);&#xD;
+	entity.remove();&#xD;
+	//刷新数据&#xD;
+	dsXlyBalRecord.flush();&#xD;
+}else{&#xD;
+    dorado.MessageBox.alert(&quot;删除失败！&quot;,{title:&quot;提示&quot;,icon:&quot;WARNING&quot;});&#xD;
+}</ClientEvent>
+        <Property name="service">customerService#deleteRecord</Property>
+        <Property name="executingMessage">正在删除</Property>
+      </AjaxAction>
+    </Container>
+    <DataSetDropDown id="dsddDialogCtm">
+      <Property name="dataSet">dsDialogCtm</Property>
+      <Property name="displayProperty">ca</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">ca</Property>
+      <Property name="editable">false</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="assignmentMap">ctmId</Property>
+      <Property name="useEmptyItem">false</Property>
+      <Property name="filterOnTyping">false</Property>
+      <Property name="reloadDataOnOpen">true</Property>
+      <Property name="filterOnOpen">false</Property>
+    </DataSetDropDown>
+    <Export2ReportAction id="export2ReportAction1">
+      <Property name="fileName">BalanceRecord</Property>
+      <Property name="extension">xlsx</Property>
+      <Property name="template">dgBalRecord</Property>
+      <Property name="dataScope">serverAll</Property>
+      <Property name="titleName">财务明细表</Property>
+      <Property name="showTitle">true</Property>
+      <Property name="maxSize">5000</Property>
+    </Export2ReportAction>
+    <DataSetDropDown id="dsddMgr">
+      <ClientEvent name="onValueSelect" signature="self,arg,afBalRecord">&#xD;
+//清除&#xD;
+	var entity = view.get(&quot;#afBalRecord.entity&quot;);&#xD;
+    entity.set(&quot;ctmName&quot;,null);&#xD;
+    entity.set(&quot;ctmId&quot;,null);&#xD;
+	view.get(&quot;#afBalRecord&quot;).refresh();&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsMgr</Property>
+      <Property name="displayProperty">salesMgrName</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">salesMgrName</Property>
+      <Property name="editable">false</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="assignmentMap">salesMgrId</Property>
+      <Property name="useEmptyItem">false</Property>
+    </DataSetDropDown>
+  </View>
+</ViewConfig>

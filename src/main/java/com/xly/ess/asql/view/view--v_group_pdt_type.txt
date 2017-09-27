@@ -1,0 +1,10 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_group_pdt_type`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_group_pdt_type` AS 
+SELECT `xym`.`ym` AS `billTime`,`vb`.`typeName` AS `pdtTypeName`,`vb`.`typeId` AS `pdtTypeId`,SUM(`vb`.`count`) AS `buySum` FROM (`xly_year_month` `xym` LEFT JOIN `v_billrecord` `vb` ON((LEFT(`vb`.`billTime`,7) = `xym`.`ym`))) WHERE (STR_TO_DATE(`xym`.`ym`,'%Y-%m-%d') BETWEEN (NOW() - INTERVAL 1 YEAR) AND NOW()) GROUP BY `xym`.`ym` ORDER BY `xym`.`ym`$$
+
+DELIMITER ;

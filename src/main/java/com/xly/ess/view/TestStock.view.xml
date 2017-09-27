@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model/>
+  <View>
+    <Button>
+      <ClientEvent name="onClick" signature="self,arg,ajaxActionDel">&#xD;
+    var parameter = {&#xD;
+    };&#xD;
+   // 调用AjaxAction&#xD;
+    ajaxActionDel.set(&quot;parameter&quot;, parameter).execute();</ClientEvent>
+      <Property name="caption">测试事务回滚</Property>
+      <Property name="action">ajaxActionDel</Property>
+    </Button>
+    <AjaxAction id="ajaxActionDel">
+      <Property name="service">balanceService#testChangeStock</Property>
+      <Property name="executingMessage">正在删除</Property>
+    </AjaxAction>
+  </View>
+</ViewConfig>

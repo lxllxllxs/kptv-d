@@ -1,0 +1,87 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP FUNCTION IF EXISTS `sp_cn`$$
+
+CREATE DEFINER=`root`@`%` FUNCTION `sp_cn`(n_LowerMoney  DECIMAL(15,2)) RETURNS VARCHAR(200) CHARSET utf8
+BEGIN
+DECLARE v_LowerStr  VARCHAR(200) ;
+DECLARE v_UpperPart VARCHAR(200) ;
+DECLARE v_UpperStr VARCHAR(200) ;
+DECLARE i_I INT ;
+SET v_LowerStr = LTRIM(RTRIM(ROUND(n_LowerMoney,2 ) ) ) ;
+SET i_I = 1 ;
+SET v_UpperStr = '' ;
+WHILE ( i_I <=CHAR_LENGTH(v_LowerStr ) )  DO
+SET v_UpperPart = CONCAT( CASE SUBSTRING(v_LowerStr,CHAR_LENGTH(v_LowerStr) - i_I + 1,1 )
+WHEN '.' THEN '元'
+WHEN '0' THEN '零'
+WHEN '1' THEN '壹'
+WHEN '2' THEN '贰'
+WHEN '3' THEN '叁'
+WHEN '4' THEN '肆'
+WHEN '5' THEN '伍'
+WHEN '6' THEN '陆'
+WHEN '7' THEN '柒'
+WHEN '8' THEN '捌'
+WHEN '9' THEN '玖'
+END,
+CASE i_I
+WHEN 1 THEN '分'
+WHEN 2 THEN '角'
+WHEN 3 THEN ''
+WHEN 4 THEN ''
+WHEN 5 THEN '拾'
+WHEN 6 THEN '佰'
+WHEN 7 THEN '仟'
+WHEN 8 THEN '万'
+WHEN 9 THEN '拾'
+WHEN 10 THEN '佰'
+WHEN 11 THEN '仟'
+WHEN 12 THEN '亿'
+WHEN 13 THEN '拾'
+WHEN 14 THEN '佰'
+WHEN 15 THEN '仟'
+WHEN 16 THEN '万'
+ELSE ''
+END );
+SET v_UpperStr =CONCAT( v_UpperPart , v_UpperStr) ;
+SET i_I = i_I + 1 ;
+END WHILE;
+SET v_UpperStr = REPLACE(v_UpperStr,'零拾','零') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零佰','零') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零仟','零') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零零零','零') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零零','零') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零角零分','整') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零分','整') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零角','零') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零亿零万零元','亿元') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'亿零万零元','亿元') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零亿零万','亿') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零万零元','万元') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'万零元','万元') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零亿','亿') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零万','万') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零元','元') ;
+SET v_UpperStr = REPLACE(v_UpperStr,'零零','零') ;
+IF ( '元' = SUBSTRING(v_UpperStr,1,1))  THEN
+SET v_UpperStr = SUBSTRING(v_UpperStr,2,(CHAR_LENGTH(v_UpperStr) - 1));
+END IF;
+IF ( '零' = SUBSTRING(v_UpperStr,1,1)) THEN
+SET v_UpperStr = SUBSTRING(v_UpperStr,2,(CHAR_LENGTH(v_UpperStr) - 1)) ;
+END IF;
+IF ( '角' = SUBSTRING(v_UpperStr,1,1)) THEN
+SET v_UpperStr = SUBSTRING(v_UpperStr,2,(CHAR_LENGTH(v_UpperStr) - 1)) ;
+END IF;
+IF ( '分' = SUBSTRING(v_UpperStr,1,1)) THEN
+SET v_UpperStr = SUBSTRING(v_UpperStr,2,(CHAR_LENGTH(v_UpperStr) - 1)) ;
+END IF;
+IF ('整' = SUBSTRING(v_UpperStr,1,1)) THEN
+SET v_UpperStr = '零元整' ;
+END IF;
+RETURN  v_UpperStr;
+END$$
+
+DELIMITER ;

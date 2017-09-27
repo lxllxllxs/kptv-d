@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="dtStockRecord" parent="dtMatStockSubrecord">
+      <PropertyDef name="matName">
+        <Property name="required">true</Property>
+        <Property name="submittable">true</Property>
+      </PropertyDef>
+      <PropertyDef name="mat2Name">
+        <Property name="required">true</Property>
+        <Property name="submittable">true</Property>
+      </PropertyDef>
+      <PropertyDef name="mat3Name"/>
+      <PropertyDef name="unit"/>
+      <PropertyDef name="supplierName"/>
+      <PropertyDef name="isPrint">
+        <Property name="dataType">boolean</Property>
+      </PropertyDef>
+      <PropertyDef name="totalPrice">
+        <Property name="dataType">BigDecimal</Property>
+      </PropertyDef>
+      <PropertyDef name="creater">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="createDate">
+        <Property name="dataType">Date</Property>
+      </PropertyDef>
+      <PropertyDef name="date1">
+        <Property name="dataType">Date</Property>
+        <Property name="displayFormat">Y-m-d</Property>
+      </PropertyDef>
+      <PropertyDef name="date2">
+        <Property name="dataType">Date</Property>
+        <Property name="displayFormat">Y-m-d</Property>
+      </PropertyDef>
+      <PropertyDef name="reviewStateN"/>
+      <PropertyDef name="checkStateN"/>
+      <PropertyDef name="recordIdStr"/>
+      <PropertyDef name="state">
+        <Property name="dataType">int</Property>
+        <Property name="mapping">
+          <Property name="mapValues">
+            <Collection>
+              <Entity>
+                <Property name="key">0</Property>
+                <Property name="value">等待化验 </Property>
+              </Entity>
+              <Entity>
+                <Property name="key">1</Property>
+                <Property name="value">化验通过</Property>
+              </Entity>
+              <Entity>
+                <Property name="key">2</Property>
+                <Property name="value">化验不通过</Property>
+              </Entity>
+              <Entity>
+                <Property name="key">3</Property>
+                <Property name="value">等待填入单价</Property>
+              </Entity>
+              <Entity>
+                <Property name="key">4</Property>
+                <Property name="value">等待审核</Property>
+              </Entity>
+              <Entity>
+                <Property name="key">5</Property>
+                <Property name="value">审核通过</Property>
+              </Entity>
+              <Entity>
+                <Property name="key">6</Property>
+                <Property name="value">审核不通过</Property>
+              </Entity>
+              <Entity>
+                <Property name="key">7</Property>
+                <Property name="value">退货</Property>
+              </Entity>
+            </Collection>
+          </Property>
+        </Property>
+      </PropertyDef>
+    </DataType>
+    <DataType name="dtRecord">
+      <PropertyDef name="date1">
+        <Property name="dataType">Date</Property>
+        <Property name="displayFormat">Y-m-d</Property>
+      </PropertyDef>
+      <PropertyDef name="date2">
+        <Property name="dataType">Date</Property>
+        <Property name="displayFormat">Y-m-d</Property>
+      </PropertyDef>
+      <PropertyDef name="supplierName"/>
+      <PropertyDef name="recordIdStr"/>
+      <PropertyDef name="matName"/>
+      <PropertyDef name="creater"/>
+      <PropertyDef name="createDate"/>
+    </DataType>
+  </Model>
+  <View>
+    <DataSet id="dsStockRecord">
+      <Property name="dataType">[dtStockRecord]</Property>
+      <Property name="dataProvider">matStockService#getMatStockRecord</Property>
+      <Property name="pageSize">40</Property>
+    </DataSet>
+    <DataSet id="dsMat1">
+      <Property name="dataType">[dtMat]</Property>
+      <Property name="dataProvider">matService#getAllMat</Property>
+    </DataSet>
+    <DataSet id="dsMat2">
+      <Property name="dataType">[dtMat2]</Property>
+      <Property name="dataProvider">matService#getAllMat2</Property>
+    </DataSet>
+    <DataSetDropDown id="dsddMat1">
+      <Property name="dataSet">dsMat1</Property>
+      <Property name="property">matName</Property>
+      <Property name="displayProperty">matName</Property>
+      <Property name="useEmptyItem">true</Property>
+      <Property name="assignmentMap">matId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddMat2">
+      <Property name="property">mat2Name</Property>
+      <Property name="displayProperty">mat2Name</Property>
+      <Property name="dataSet">dsMat2</Property>
+      <Property name="assignmentMap">mat2Id</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">true</Property>
+      <Property name="reloadDataOnOpen">true</Property>
+    </DataSetDropDown>
+    <ListDropDown id="lddReview">
+      <Property name="items">
+        <Collection>
+          <Entity>
+            <Property name="key">0</Property>
+            <Property name="value">未审核</Property>
+          </Entity>
+          <Entity>
+            <Property name="key">1</Property>
+            <Property name="value">审核通过</Property>
+          </Entity>
+          <Entity>
+            <Property name="key">2</Property>
+            <Property name="value">审核不通过</Property>
+          </Entity>
+        </Collection>
+      </Property>
+      <Property name="displayProperty">value</Property>
+      <Property name="assignmentMap">reviewState=key</Property>
+      <Property name="property">value</Property>
+      <Property name="useEmptyItem">true</Property>
+    </ListDropDown>
+    <ListDropDown id="lddCheck">
+      <Property name="items">
+        <Collection>
+          <Entity>
+            <Property name="key">0</Property>
+            <Property name="value">未化验</Property>
+          </Entity>
+          <Entity>
+            <Property name="key">1</Property>
+            <Property name="value">化验通过</Property>
+          </Entity>
+          <Entity>
+            <Property name="key">2</Property>
+            <Property name="value">化验不通过</Property>
+          </Entity>
+          <Entity>
+            <Property name="key">3</Property>
+            <Property name="value">无需化验</Property>
+          </Entity>
+        </Collection>
+      </Property>
+      <Property name="displayProperty">value</Property>
+      <Property name="assignmentMap">checkState=key</Property>
+      <Property name="property">value</Property>
+      <Property name="useEmptyItem">true</Property>
+    </ListDropDown>
+    <AutoForm id="afRecord">
+      <Property name="cols">*,*,*,*,*</Property>
+      <Property name="labelSpacing">:</Property>
+      <Property name="labelAlign">right</Property>
+      <Property name="dataType">dtRecord</Property>
+      <Property name="createPrivateDataSet">true</Property>
+      <AutoFormElement>
+        <Property name="name">matName</Property>
+        <Property name="property">matName</Property>
+        <Property name="label">组名</Property>
+        <Property name="trigger">dsddMat1</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">mat2Name</Property>
+        <Property name="property">mat2Name</Property>
+        <Property name="label">类别</Property>
+        <Property name="trigger">dsddMat2</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">mat3Name</Property>
+        <Property name="property">mat3Name</Property>
+        <Property name="label">品名</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">supplierName</Property>
+        <Property name="property">supplierName</Property>
+        <Property name="label">供应商</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">applicant</Property>
+        <Property name="property">applicant</Property>
+        <Property name="label">申请人</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">reviewStateN</Property>
+        <Property name="property">reviewStateN</Property>
+        <Property name="label">审核状态</Property>
+        <Property name="editorType">TextEditor</Property>
+        <Property name="trigger">lddReview</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">checkStateN</Property>
+        <Property name="property">checkStateN</Property>
+        <Property name="label">验收状态</Property>
+        <Property name="trigger">lddCheck</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">creater</Property>
+        <Property name="property">creater</Property>
+        <Property name="label">入库员</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="label">入库时间</Property>
+        <Property name="name">createDate</Property>
+        <Property name="property">createDate</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">date1</Property>
+        <Property name="property">date1</Property>
+        <Property name="label">起始时间</Property>
+        <Property name="trigger">defaultDateDropDown</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="label">截止时间</Property>
+        <Property name="name">date2</Property>
+        <Property name="property">date2</Property>
+        <Property name="trigger">defaultDateDropDown</Property>
+        <Editor/>
+      </AutoFormElement>
+    </AutoForm>
+    <ToolBar>
+      <DataPilot>
+        <Property name="dataSet">dsStockRecord</Property>
+        <Property name="itemCodes">pages,pageSize</Property>
+      </DataPilot>
+      <ToolBarButton id="btnQuery">
+        <ClientEvent name="onClick" signature="self,arg,afRecord,dsStockRecord">//获取afCondition绑定的实体对象&#xD;
+var entity = afRecord.get(&quot;entity&quot;);&#xD;
+var matId=entity.get(&quot;matId&quot;);&#xD;
+var mat2Id=entity.get(&quot;mat2Id&quot;);&#xD;
+var mat3Name=entity.get(&quot;mat3Name&quot;);&#xD;
+var supplierName=entity.get(&quot;supplierName&quot;);&#xD;
+var applicant=entity.get(&quot;applicant&quot;);&#xD;
+var reviewStateN=entity.get(&quot;reviewStateN&quot;);&#xD;
+var checkStateN=entity.get(&quot;checkStateN&quot;);&#xD;
+var creater=entity.get(&quot;creater&quot;);&#xD;
+var createDate=entity.get(&quot;createDate&quot;);&#xD;
+&#xD;
+var date1=entity.get(&quot;date1&quot;);&#xD;
+var date2=entity.get(&quot;date2&quot;);&#xD;
+if(date1==null || date2==null){&#xD;
+	console.log('entity',entity);&#xD;
+        dsStockRecord.set(&quot;parameter&quot;,entity).flushAsync();&#xD;
+}else{&#xD;
+date1=date1.formatDate(&quot;Y-m-d&quot;);&#xD;
+date2=date2.formatDate(&quot;Y-m-d&quot;);&#xD;
+if(date1&lt;date2){&#xD;
+&#xD;
+	//将实体对象作为参数传入，并异步刷新&#xD;
+    dsStockRecord.set(&quot;parameter&quot;,{&quot;date1&quot;:date1,&#xD;
+	&quot;date2&quot;:date2,&#xD;
+	&quot;matId&quot;:matId,&#xD;
+	&quot;mat2Id&quot;:mat2Id,&#xD;
+	&quot;mat3Name&quot;:mat3Name,&#xD;
+	&quot;supplierName&quot;:supplierName,&#xD;
+	&quot;applicant&quot;:applicant,&#xD;
+	&quot;reviewStateN&quot;:reviewStateN,&#xD;
+	&quot;checkStateN&quot;:checkStateN,&#xD;
+	&quot;creater&quot;:creater,&#xD;
+	&quot;createDate&quot;:createDate&#xD;
+	}).flushAsync();&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(&quot;时间区间有误，请重新选择！&quot;);&#xD;
+}&#xD;
+}&#xD;
+</ClientEvent>
+        <Property name="caption">查询</Property>
+        <Property name="icon"> url(>skin>common/icons.gif) -20px -40px</Property>
+      </ToolBarButton>
+      <ToolBarButton id="btnExport">
+        <Property name="caption">导出</Property>
+        <Property name="icon">url(>skin>common/icons.gif) -180px -120px</Property>
+        <Property name="action">export2ReportAction1</Property>
+      </ToolBarButton>
+    </ToolBar>
+    <DataGrid id="dgStockRecord">
+      <Property name="dataSet">dsStockRecord</Property>
+      <Property name="readOnly">true</Property>
+      <DataColumn name="recordIdStr">
+        <Property name="property">recordIdStr</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">票号</Property>
+      </DataColumn>
+      <DataColumn name="matName">
+        <Property name="property">matName</Property>
+        <Property name="caption">组名</Property>
+        <Property name="align">center</Property>
+      </DataColumn>
+      <DataColumn name="mat2Name">
+        <Property name="property">mat2Name</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">类别</Property>
+      </DataColumn>
+      <DataColumn name="mat3Name">
+        <Property name="property">mat3Name</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">品名</Property>
+      </DataColumn>
+      <DataColumn name="unit">
+        <Property name="property">unit</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">单位</Property>
+      </DataColumn>
+      <DataColumn name="count">
+        <Property name="property">count</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">入库数量</Property>
+      </DataColumn>
+      <DataColumn name="price">
+        <Property name="property">price</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">单价</Property>
+      </DataColumn>
+      <DataColumn name="createDate">
+        <Property name="property">createDate</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">入库日期</Property>
+      </DataColumn>
+      <DataColumn name="supplierName">
+        <Property name="property">supplierName</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">供应商</Property>
+      </DataColumn>
+      <DataColumn name="applicant">
+        <Property name="property">applicant</Property>
+        <Property name="caption">申请人</Property>
+        <Property name="align">center</Property>
+      </DataColumn>
+      <DataColumn name="reviewState">
+        <Property name="property">reviewState</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">审核状态</Property>
+      </DataColumn>
+      <DataColumn name="checkState">
+        <Property name="property">checkState</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">验收状态</Property>
+      </DataColumn>
+      <DataColumn name="subtotal">
+        <Property name="property">subtotal</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">小计</Property>
+      </DataColumn>
+      <DataColumn name="totalPrice">
+        <Property name="property">totalPrice</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">总金额</Property>
+      </DataColumn>
+      <DataColumn name="state">
+        <Property name="property">state</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">状态</Property>
+      </DataColumn>
+      <DataColumn name="creater">
+        <Property name="property">creater</Property>
+        <Property name="align">center</Property>
+        <Property name="caption">入库员</Property>
+      </DataColumn>
+    </DataGrid>
+    <Export2ReportAction id="export2ReportAction1">
+      <Property name="fileName">WarehousRecord</Property>
+      <Property name="extension">xlsx</Property>
+      <Property name="template">dgStockRecord</Property>
+      <Property name="dataScope">serverAll</Property>
+      <Property name="titleName">入库记录表</Property>
+      <Property name="showTitle">true</Property>
+      <Property name="maxSize">5000</Property>
+    </Export2ReportAction>
+  </View>
+</ViewConfig>

@@ -1,0 +1,24 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_patternno_grade`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_patternno_grade` AS 
+SELECT
+  SUM(`vb`.`count`) AS `sum`,
+  `vb`.`billTime`   AS `billTime`,
+  `vb`.`typeId`     AS `typeId`,
+  `vb`.`typeName`   AS `typeName`,
+  `vb`.`brandId`    AS `brandId`,
+  `vb`.`brandName`  AS `brandName`,
+  `vb`.`patternNo`  AS `patternNo`,
+  `vb`.`gradesId`   AS `gradesId`,
+  `vb`.`gradesName` AS `gradesName`
+FROM `v_billrecord` `vb`
+WHERE ((`vb`.`bState` = 1)
+       AND (`vb`.`gradesId` < 5))
+GROUP BY `vb`.`typeId`,`vb`.`patternNo`,`vb`.`gradesId`
+ORDER BY `vb`.`typeId`,`vb`.`brandId`,`vb`.`patternNo`,`vb`.`gradesId`$$
+
+DELIMITER ;

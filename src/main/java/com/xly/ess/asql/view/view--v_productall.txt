@@ -1,0 +1,33 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_productall`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_productall` AS 
+SELECT
+  `vp`.`ID`          AS `ID`,
+  `pt`.`TYPE_NAME`   AS `TYPE_NAME`,
+  `pb`.`BRAND_NAME`  AS `BRAND_NAME`,
+  `vp`.`CATEGORT`    AS `CATEGORT`,
+  `vp`.`COLOR`       AS `COLOR`,
+  `vp`.`BENCHMARK`   AS `BENCHMARK`,
+  `vp`.`PATTERN_NO`  AS `PATTERN_NO`,
+  `vp`.`BRAND_ID`    AS `BRAND_ID`,
+  `pg`.`GRADES_ID`   AS `GRADES_ID`,
+  `pg`.`GRADES_NAME` AS `GRADES_NAME`,
+  `ps`.`SPEC_NAME`   AS `SPEC_NAME`,
+  `pt`.`QTY`         AS `QTY`,
+  `pt`.`TYPE_ID`     AS `TYPE_ID`,
+  `ps`.`SPEC_ID`     AS `SPEC_ID`
+FROM ((((`v_product` `vp`
+      JOIN `xly_pdt_bra` `pb`)
+     JOIN `xly_pdt_gd` `pg`)
+    JOIN `xly_pdt_spec` `ps`)
+   JOIN `xly_pdt_typ` `pt`)
+WHERE ((`vp`.`BRAND_ID` = `pb`.`BRAND_ID`)
+       AND (`vp`.`GRADES_ID` = `pg`.`GRADES_ID`)
+       AND (`vp`.`SPEC_ID` = `ps`.`SPEC_ID`)
+       AND (`vp`.`TYPE_ID` = `pt`.`TYPE_ID`))$$
+
+DELIMITER ;

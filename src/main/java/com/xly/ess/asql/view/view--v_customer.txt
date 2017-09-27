@@ -1,0 +1,25 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_customer`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_customer` AS 
+SELECT
+  `cmt`.`CTM_ID`         AS `ctmId`,
+  `cmt`.`CTM_NAME`       AS `ctmName`,
+  `cmt`.`TYPE_ID`        AS `typeId`,
+  `cmt`.`ADDRESS`        AS `address`,
+  `cmt`.`SHOP_NAME`      AS `shopName`,
+  `cmt`.`SALES_MGR_ID`   AS `salesMgrId`,
+  CONCAT(`cmt`.`CTM_NAME`,'--',`cmt`.`ADDRESS`) AS `ca`,
+  CONVERT(DECODE(`cmt`.`MONEY`,'xly') USING utf8) AS `money`,
+  `cmt`.`GRT_MONEY`      AS `grtMoney`,
+  `cmt`.`DEBT`           AS `debt`,
+  `mgr`.`SALES_MGR_NAME` AS `salesMgrName`
+FROM (`xly_customer` `cmt`
+   JOIN `bdf2_user_position` `mgr`)
+WHERE (`mgr`.`SALES_MGR_ID` = `cmt`.`SALES_MGR_ID`)
+ORDER BY `cmt`.`CTM_ID` DESC$$
+
+DELIMITER ;

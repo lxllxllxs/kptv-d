@@ -1,0 +1,31 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_stock`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_stock` AS 
+SELECT
+  `ps`.`ID`          AS `STOCK_ID`,
+  `ps`.`WAREHOUSE`   AS `WAREHOUSE`,
+  `ps`.`STATE`       AS `STATE`,
+  `ps`.`STOCK`       AS `STOCK`,
+  `vp`.`ID`          AS `ID`,
+  `vp`.`CATEGORT`    AS `CATEGORT`,
+  `vp`.`COLOR`       AS `COLOR`,
+  `vp`.`PATTERN_NO`  AS `PATTERN_NO`,
+  `vp`.`BRAND_NAME`  AS `BRAND_NAME`,
+  `vp`.`BRAND_ID`    AS `BRAND_ID`,
+  `vp`.`GRADES_NAME` AS `GRADES_NAME`,
+  `vp`.`SPEC_ID`     AS `SPEC_ID`,
+  `vp`.`SPEC_NAME`   AS `SPEC_NAME`,
+  `vp`.`BENCHMARK`   AS `BENCHMARK`,
+  `vp`.`TYPE_NAME`   AS `TYPE_NAME`,
+  `vp`.`QTY`         AS `QTY`,
+  `vp`.`GRADES_ID`   AS `GRADES_ID`,
+  `vp`.`TYPE_ID`     AS `TYPE_ID`
+FROM (`xly_pdt_stock` `ps`
+   JOIN `v_productall` `vp`)
+WHERE (`ps`.`PRODUCT_ID` = `vp`.`ID`)$$
+
+DELIMITER ;
