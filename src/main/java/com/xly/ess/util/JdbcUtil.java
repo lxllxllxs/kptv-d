@@ -1,6 +1,7 @@
 package com.xly.ess.util;
   
 import java.sql.*;    
+
 import javax.sql.*;    
   
 /** 
@@ -23,6 +24,7 @@ public final class JdbcUtil {
             throw new ExceptionInInitializerError(e);    
         }    
     }    
+    	
     
     public static Connection getConnection() throws SQLException{    
         return DriverManager.getConnection(url, user, password);    
