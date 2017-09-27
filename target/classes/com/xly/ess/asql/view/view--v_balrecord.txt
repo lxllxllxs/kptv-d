@@ -1,0 +1,23 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_balrecord`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_balrecord` AS 
+SELECT
+  `br`.`BAL_ID`      AS `balId`,
+  `br`.`CREATER`     AS `creater`,
+  `br`.`CREATE_TIME` AS `createTime`,
+  `br`.`OPT_TYPE`    AS `optType`,
+  `ctm`.`CTM_NAME`   AS `ctmName`,
+  `ctm`.`CTM_ID`     AS `ctmId`,
+  `br`.`AMOUNT`      AS `amount`,
+  `br`.`REMARK`      AS `remark`,
+  `ctm`.`ADDRESS`    AS `address`
+FROM (`xly_bal_record` `br`
+   JOIN `xly_customer` `ctm`)
+WHERE (`ctm`.`CTM_ID` = `br`.`CTM_ID`)
+ORDER BY `br`.`BAL_ID` DESC$$
+
+DELIMITER ;

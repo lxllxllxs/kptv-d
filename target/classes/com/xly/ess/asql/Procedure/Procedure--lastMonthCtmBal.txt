@@ -1,0 +1,33 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP PROCEDURE IF EXISTS `lastMonthCtmBal`$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `lastMonthCtmBal`()
+BEGIN
+    DECLARE lastMonth VARCHAR(7);
+    DECLARE V_MONEY DOUBLE DEFAULT 0;
+    DECLARE V_CTMID INT DEFAULT 0;
+    
+    DECLARE done BOOLEAN DEFAULT FALSE;
+     -- 因为实在1号的凌晨执行 所以凌晨时的数据还是当做是上一个月的余额
+    DECLARE cur CURSOR FOR 
+    SELECT ctm.`CTM_ID`,(SELECT dcoM(ctm.`CTM_ID`)) MONEY FROM xly_customer ctm;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  OPEN cur;
+    SET @a=0;
+  -- 开始循环
+  read_loop: LOOP
+    -- 提取游标里的数据，这里只有一个，多个的话也一样；
+    FETCH cur INTO V_CTMID,V_MONEY;
+    -- 声明结束的时候
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+    INSERT INTO xly_ctm_bal (CTM_ID,BALANCE,END_MONTH)VALUES (V_CTMID,V_MONEY,DATE_SUB(NOW(),INTERVAL 1 MONTH));
+  END LOOP;
+  CLOSE cur;
+    END$$
+
+DELIMITER ;

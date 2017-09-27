@@ -1,4 +1,4 @@
-package com.xly.ess.util;
+package com.kptv.temp;
   
 import java.io.DataInputStream;  
 import java.io.File;  
@@ -15,6 +15,8 @@ import org.apache.commons.lang3.ArrayUtils;
   
 import com.mysql.jdbc.Connection;  
 import com.mysql.jdbc.Statement;  
+import com.xly.ess.util.CCRDFile;
+import com.xly.ess.util.JdbcUtil;
   
 public class DownloadPicture {  
 	private static final String FILE_PATH="D:/kpbtv/lxl/";
@@ -37,21 +39,17 @@ public class DownloadPicture {
     private void downloadPicture(ArrayList<String> urlList,String filePath) {  
         URL url = null;  
         int imageNumber = 0;  
-          
         for (String urlString : urlList) {  
             try {  
                 url = new URL(urlString);  
                 DataInputStream dataInputStream = new DataInputStream(url.openStream());  
                 String imageName = FILE_PATH+filePath+"/"+imageNumber + ".jpg";  //实际保存路径
                 FileOutputStream fileOutputStream = new FileOutputStream(new File(imageName));  
-  
                 byte[] buffer = new byte[1024];  
                 int length;  
-  
                 while ((length = dataInputStream.read(buffer)) > 0) {  
                     fileOutputStream.write(buffer, 0, length);  
                 }  
-  
                 dataInputStream.close();  
                 fileOutputStream.close();  
                 imageNumber++;  
@@ -82,14 +80,15 @@ public class DownloadPicture {
             ResultSet resultSet = statement.executeQuery(sql);  
             resultSet.next();
             while (resultSet.next()) {  
+                String id = resultSet.getString("ID");  
                 String childName = resultSet.getString("childName");  
                 String kindergarten = resultSet.getString("kindergarten");  
                 String phone = resultSet.getString("phone");  
                 String parentName = resultSet.getString("parentName");  
                 String urlString = resultSet.getString("urlString");  
                 //创建文件夹
-                String dirsName=childName+" "+kindergarten+" "+parentName+" "+phone;
-                CCRDFile.createDir(FILE_PATH+dirsName);
+                String dirsName=childName+" "+kindergarten+" "+parentName+" "+phone;//暂时不用
+                CCRDFile.createDir(FILE_PATH+id);
                 //切割链接 获得链接集合
                 urlString=urlString.replaceAll("@@", "#");
                 urlList= new ArrayList<String>(Arrays.asList(urlString.split("#")));

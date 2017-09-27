@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="dtXlyWhFreeze" parent="dtWhFreeze">
+      <PropertyDef name="ctmName">
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="address"/>
+      <PropertyDef name="typeName"/>
+      <PropertyDef name="brandName"/>
+      <PropertyDef name="categort"/>
+      <PropertyDef name="patternNo"/>
+      <PropertyDef name="color"/>
+      <PropertyDef name="gradesName"/>
+      <PropertyDef name="specName"/>
+      <PropertyDef name="endDate">
+        <Property name="label">endDate</Property>
+        <Property name="dataType">Date</Property>
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="count">
+        <Property name="required">true</Property>
+      </PropertyDef>
+      <PropertyDef name="unFreeze">
+        <Property name="submittable">false</Property>
+      </PropertyDef>
+      <PropertyDef name="warehouse"/>
+    </DataType>
+  </Model>
+  <View>
+    <DataSet id="dsXlyWhFreeze">
+      <Property name="dataType">[dtXlyWhFreeze]</Property>
+      <Property name="dataProvider">freezeService#getAllFreeze</Property>
+      <Property name="pageSize">50</Property>
+    </DataSet>
+    <AutoForm id="afCondition">
+      <Property name="createPrivateDataSet">true</Property>
+      <Property name="cols">*,*,*,*,*</Property>
+      <Property name="labelSeparator">：</Property>
+      <Property name="labelAlign">center</Property>
+      <Property name="labelSpacing">1</Property>
+      <AutoFormElement>
+        <Property name="name">ctmName</Property>
+        <Property name="property">ctmName</Property>
+        <Property name="label">客户</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">patternNo</Property>
+        <Property name="property">patternNo</Property>
+        <Property name="label">编号</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">endDate</Property>
+        <Property name="property">endDate</Property>
+        <Property name="label">结束时间</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">createTime</Property>
+        <Property name="property">createTime</Property>
+        <Property name="label">创建时间</Property>
+        <Editor/>
+      </AutoFormElement>
+      <AutoFormElement>
+        <Property name="name">creater</Property>
+        <Property name="property">creater</Property>
+        <Property name="label">创建人</Property>
+        <Editor/>
+      </AutoFormElement>
+    </AutoForm>
+    <Container>
+      <ToolBar>
+        <DataPilot>
+          <Property name="itemCodes">pages,pageSize</Property>
+          <Property name="dataSet">dsXlyWhFreeze</Property>
+        </DataPilot>
+        <ToolBarButton id="btnQuery">
+          <ClientEvent name="onClick" signature="self,arg,afCondition,dsXlyWhFreeze">//获取afCondition绑定的实体对象&#xD;
+var entity = afCondition.get(&quot;entity&quot;);&#xD;
+//将实体对象作为参数传入，并异步刷新&#xD;
+dsXlyWhFreeze.set(&quot;parameter&quot;,entity).flushAsync();</ClientEvent>
+          <Property name="caption">查询</Property>
+          <Property name="icon"> url(>skin>common/icons.gif) -20px -40px</Property>
+        </ToolBarButton>
+        <ToolBarButton id="btnEdit">
+          <ClientEvent name="onClick" signature="self,arg,dialogAdd">dialogAdd.show();&#xD;
+</ClientEvent>
+          <Property name="caption">修改</Property>
+          <Property name="icon"> url(>skin>common/icons.gif) -200px -0px</Property>
+        </ToolBarButton>
+        <ToolBarButton id="btnExport">
+          <Property name="caption">导出</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -120px</Property>
+          <Property name="action">export2ReportAction1</Property>
+        </ToolBarButton>
+      </ToolBar>
+      <DataGrid id="dgWhFreeze">
+        <ClientEvent name="onCreate" signature="self,arg,dsXlyWhFreeze"> var OperationCellRenderer = $extend(dorado.widget.grid.SubControlCellRenderer,&#xD;
+{&#xD;
+    createSubControl : function(arg) {&#xD;
+        //返回按钮对象并为按钮对象绑定onClick事件&#xD;
+        return new dorado.widget.Button({&#xD;
+            onClick : function(self) {&#xD;
+				var entity = dsXlyWhFreeze.get(&quot;data:#&quot;);&#xD;
+                var freezeId = view.get(&quot;#dsXlyWhFreeze.data:#.#freezeId&quot;);&#xD;
+                var stockId = view.get(&quot;#dsXlyWhFreeze.data:#.#stockId&quot;);&#xD;
+                var count = view.get(&quot;#dsXlyWhFreeze.data:#.#count&quot;);&#xD;
+&#xD;
+                if(entity){&#xD;
+                    dorado.MessageBox.confirm(&quot;确认要解除该条记录吗？&quot;, function(){&#xD;
+		            // 将参数拼装成JSON形式&#xD;
+                    var parameter = {&#xD;
+                         freezeId: freezeId,&#xD;
+                         stockId: stockId,&#xD;
+				         count: count&#xD;
+                    };&#xD;
+                    // 调用AjaxAction&#xD;
+                    view.get(&quot;#ajaxActionDel&quot;).set(&quot;parameter&quot;, parameter).execute();&#xD;
+&#xD;
+                    })&#xD;
+                }&#xD;
+     &#xD;
+            } &#xD;
+        });&#xD;
+    },&#xD;
+    refreshSubControl : function(button, arg) {&#xD;
+        //设置按钮的标题&#xD;
+        button.set({&#xD;
+            caption : &quot;解冻&quot;,&#xD;
+            disabled : false,&#xD;
+			width : 70,&#xD;
+			style : {color:&quot;#ff6666&quot;,backgroundColor:&quot;#bebebe&quot;}&#xD;
+        });&#xD;
+    }&#xD;
+});&#xD;
+self.set(&quot;#unFreeze.renderer&quot;, new OperationCellRenderer());</ClientEvent>
+        <Property name="dataSet">dsXlyWhFreeze</Property>
+        <Property name="readOnly">true</Property>
+        <DataColumn>
+          <Property name="name">unFreeze</Property>
+          <Property name="width">70</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">解冻</Property>
+          <Editor/>
+        </DataColumn>
+        <DataColumn name="ctmName">
+          <Property name="property">ctmName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">客户姓名</Property>
+        </DataColumn>
+        <DataColumn name="address">
+          <Property name="property">address</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">地址</Property>
+        </DataColumn>
+        <DataColumn name="typeName">
+          <Property name="property">typeName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">种类</Property>
+        </DataColumn>
+        <DataColumn name="brandName">
+          <Property name="property">brandName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">品牌</Property>
+        </DataColumn>
+        <DataColumn name="categort">
+          <Property name="property">categort</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">类别</Property>
+        </DataColumn>
+        <DataColumn name="patternNo">
+          <Property name="property">patternNo</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">编号</Property>
+        </DataColumn>
+        <DataColumn name="gradesName">
+          <Property name="property">gradesName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">等级</Property>
+        </DataColumn>
+        <DataColumn name="color">
+          <Property name="property">color</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">色别</Property>
+        </DataColumn>
+        <DataColumn name="specName">
+          <Property name="property">specName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">规格</Property>
+        </DataColumn>
+        <DataColumn name="warehouse">
+          <Property name="property">warehouse</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">库位</Property>
+        </DataColumn>
+        <DataColumn name="count">
+          <Property name="property">count</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">冻结数量</Property>
+          <Property name="dataType">int</Property>
+          <Property name="displayFormat">#,###</Property>
+        </DataColumn>
+        <DataColumn name="endDate">
+          <Property name="property">endDate</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">结束时间</Property>
+        </DataColumn>
+        <DataColumn name="remark">
+          <Property name="property">remark</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">备注</Property>
+        </DataColumn>
+        <DataColumn name="createTime">
+          <Property name="property">createTime</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">创建时间</Property>
+          <Property name="width">120</Property>
+        </DataColumn>
+        <DataColumn name="creater">
+          <Property name="property">creater</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">创建人</Property>
+        </DataColumn>
+        <DataColumn name="modifyDate">
+          <Property name="property">modifyDate</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">修改时间</Property>
+          <Property name="width">120</Property>
+        </DataColumn>
+        <DataColumn name="finalModifier">
+          <Property name="property">finalModifier</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">修改人</Property>
+        </DataColumn>
+      </DataGrid>
+      <AjaxAction id="ajaxActionDel">
+        <ClientEvent name="onSuccess" signature="self,arg,dsXlyWhFreeze,dsPdtStock">var entity = dsXlyWhFreeze.get(&quot;data:#&quot;);&#xD;
+&#xD;
+//获取返回值&#xD;
+var result = self.get(&quot;returnValue&quot;);&#xD;
+//根据返回值判断&#xD;
+if(result){&#xD;
+    dorado.MessageBox.alert(&quot;解冻成功！&quot;);&#xD;
+	entity.remove();&#xD;
+	//刷新数据&#xD;
+	dsXlyWhFreeze.flush();&#xD;
+	dsPdtStock.flush();&#xD;
+}else{&#xD;
+    dorado.MessageBox.alert(&quot;解冻失败！&quot;,{title:&quot;提示&quot;,icon:&quot;WARNING&quot;});&#xD;
+}</ClientEvent>
+        <Property name="service">freezeService#UnFreeze</Property>
+        <Property name="executingMessage">正在删除</Property>
+      </AjaxAction>
+      <Dialog id="dialogAdd">
+        <Property name="caption">冻结信息</Property>
+        <Property name="width">350</Property>
+        <Property name="height">250</Property>
+        <Property name="closeAction">hide</Property>
+        <Buttons>
+          <Button id="dBtnSave">
+            <ClientEvent name="onClick" signature="self,arg,dialogAdd,updateactionSave,dsWhRecordSave,dsXlyWhFreeze">//在保存操作完成后的回调函数中将编辑弹出框隐藏&#xD;
+updateactionSave.execute(function(){&#xD;
+	dsXlyWhFreeze.flush();&#xD;
+    dialogAdd.hide();&#xD;
+&#xD;
+})</ClientEvent>
+            <Property name="caption">保存</Property>
+            <Property name="icon">url(>skin>common/icons.gif) -140px -20px</Property>
+          </Button>
+          <Button id="dBtnCancel">
+            <ClientEvent name="onClick" signature="self,arg,dialogAdd">&#xD;
+dialogAdd.hide();</ClientEvent>
+            <Property name="caption">取消</Property>
+            <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
+          </Button>
+        </Buttons>
+        <Children>
+          <AutoForm id="afProduct">
+            <Property name="cols">*</Property>
+            <Property name="readOnly">false</Property>
+            <Property name="createPrivateDataSet">true</Property>
+            <Property name="dataSet">dsXlyWhFreeze</Property>
+            <AutoFormElement>
+              <Property name="name">count</Property>
+              <Property name="property">count</Property>
+              <Property name="label">数量</Property>
+              <Editor/>
+            </AutoFormElement>
+            <AutoFormElement>
+              <Property name="name">endDate</Property>
+              <Property name="property">endDate</Property>
+              <Property name="label">结束时间</Property>
+              <Property name="trigger">defaultDateTimeDropDown</Property>
+              <Editor/>
+            </AutoFormElement>
+          </AutoForm>
+        </Children>
+        <Tools/>
+      </Dialog>
+      <UpdateAction id="updateactionSave">
+        <ClientEvent name="onFailure"> </ClientEvent>
+        <ClientEvent name="onSuccess">var info = self.get(&quot;returnValue&quot;);&#xD;
+&#xD;
+if(info.result){&#xD;
+	dorado.MessageBox.alert(info.msg);&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(info.msg, {&#xD;
+    icon: &quot;WARNING&quot;&#xD;
+});&#xD;
+}</ClientEvent>
+        <Property name="dataResolver">freezeService#modifyFrezeeReocord</Property>
+        <Property name="executingMessage">正在保存。。。</Property>
+        <Property name="hotkey">ctrl+s</Property>
+        <UpdateItem>
+          <Property name="dataSet">dsXlyWhFreeze</Property>
+        </UpdateItem>
+      </UpdateAction>
+    </Container>
+    <Export2ReportAction id="export2ReportAction1">
+      <Property name="fileName">WhFreezeList</Property>
+      <Property name="extension">xlsx</Property>
+      <Property name="template">dgWhFreeze</Property>
+      <Property name="dataScope">serverAll</Property>
+      <Property name="titleName">冻结库存记录表</Property>
+      <Property name="showTitle">true</Property>
+      <Property name="maxSize">5000</Property>
+    </Export2ReportAction>
+  </View>
+</ViewConfig>

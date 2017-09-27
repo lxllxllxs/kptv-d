@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model/>
+  <View>
+    <Container layout="hbox">
+      <Property name="height">50</Property>
+      <AutoForm id="afCondition">
+        <Property name="labelSeparator">:</Property>
+        <Property name="cols">*</Property>
+        <Property name="width">300</Property>
+        <Property name="labelWidth">50</Property>
+        <AutoFormElement id="years">
+          <Property name="label">年份</Property>
+          <Property name="trigger">lddYears</Property>
+          <Property name="name">years</Property>
+          <Editor/>
+        </AutoFormElement>
+      </AutoForm>
+      <ListDropDown id="lddYears">
+        <Property name="items">
+          <Collection>
+            <Entity>
+              <Property name="key">1</Property>
+              <Property name="label">今年</Property>
+            </Entity>
+            <Entity>
+              <Property name="key">2</Property>
+              <Property name="label">去年</Property>
+            </Entity>
+          </Collection>
+        </Property>
+        <Property name="property">label</Property>
+        <Property name="displayProperty">label</Property>
+        <Property name="assignmentMap">key</Property>
+      </ListDropDown>
+      <Button>
+        <ClientEvent name="onClick" signature="self,arg,afCondition,updateactionSave">//获取afCondition绑定的实体对象&#xD;
+var entity = afCondition.get(&quot;entity&quot;);&#xD;
+&#xD;
+var date = new Date();&#xD;
+var strYear = date.getYear()+1900;&#xD;
+		&#xD;
+if(entity.key==1){//今年&#xD;
+	// 将参数拼装成JSON形式&#xD;
+     var parameter = {&#xD;
+        YEAR: strYear,&#xD;
+		type : 6&#xD;
+     };&#xD;
+           &#xD;
+    updateactionSave.set(&quot;parameter&quot;, parameter).execute();&#xD;
+}else if(entity.key==2){//去年&#xD;
+    strYear=parseInt(strYear)-1;&#xD;
+	// 将参数拼装成JSON形式&#xD;
+     var parameter = {&#xD;
+        YEAR: strYear,&#xD;
+		type : 6&#xD;
+     };&#xD;
+           &#xD;
+    updateactionSave.set(&quot;parameter&quot;, parameter).execute();&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(&quot;请选择年份！&quot;);&#xD;
+}&#xD;
+&#xD;
+</ClientEvent>
+        <Property name="caption">统计分析</Property>
+        <Property name="style">
+          <Property name="color">#ffffff</Property>
+          <Property name="backgroundColor">#15a4fa</Property>
+        </Property>
+      </Button>
+    </Container>
+    <UpdateAction id="updateactionSave">
+      <ClientEvent name="onFailure"> </ClientEvent>
+      <ClientEvent name="onSuccess">&#xD;
+var info = self.get(&quot;returnValue&quot;);&#xD;
+if(info.result){&#xD;
+	location.href=info.url;&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(&quot;没有该年份数据！&quot;, {&#xD;
+    icon: &quot;WARNING&quot;&#xD;
+    });&#xD;
+}&#xD;
+</ClientEvent>
+      <Property name="dataResolver">salesService#checkCommissionData</Property>
+      <Property name="executingMessage">正在保存。。。</Property>
+    </UpdateAction>
+  </View>
+</ViewConfig>

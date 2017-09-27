@@ -1,0 +1,14 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP FUNCTION IF EXISTS `getPIdByStockId`$$
+
+CREATE DEFINER=`root`@`%` FUNCTION `getPIdByStockId`(stockId INT) RETURNS INT(11)
+BEGIN
+    DECLARE  pId INT DEFAULT 0;
+	 SELECT PRODUCT_ID INTO pId FROM xly_pdt_stock WHERE ID = stockId;
+	 RETURN pId;
+    END$$
+
+DELIMITER ;

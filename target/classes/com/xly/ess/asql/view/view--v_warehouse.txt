@@ -1,0 +1,41 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_warerecord`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_warerecord` AS 
+SELECT
+  `vp`.`ID`             AS `PRODUCT_ID`,
+  `vp`.`TYPE_NAME`      AS `TYPE_NAME`,
+  `vp`.`TYPE_ID`        AS `TYPE_ID`,
+  `vp`.`BRAND_NAME`     AS `BRAND_NAME`,
+  `vp`.`BRAND_ID`       AS `BRAND_ID`,
+  `vp`.`CATEGORT`       AS `CATEGORT`,
+  `vp`.`COLOR`          AS `COLOR`,
+  `vp`.`GRADES_NAME`    AS `GRADES_NAME`,
+  `vp`.`GRADES_ID`      AS `GRADES_ID`,
+  `vp`.`PATTERN_NO`     AS `PATTERN_NO`,
+  `vp`.`QTY`            AS `QTY`,
+  `vp`.`SPEC_NAME`      AS `SPEC_NAME`,
+  `whr`.`ID`            AS `RECORD_ID`,
+  `whr`.`WAREHOUSE`     AS `WAREHOUSE`,
+  `whr`.`STOCK`         AS `STOCK`,
+  `whr`.`CREATE_DATE`   AS `CREATE_DATE`,
+  `whr`.`CREATER`       AS `CREATER`,
+  `whr`.`PRODUCED_DATE` AS `PRODUCED_DATE`,
+  `whr`.`REMARK`        AS `REMARK`,
+  `cla`.`CLASSES_ID`    AS `CLASSES_ID`,
+  `cla`.`CLASSES_NAME`  AS `CLASSES_NAME`,
+  `wht`.`TYPE_ID`       AS `OPT_ID`,
+  `wht`.`TYPE_NAME`     AS `OPT_TYPE`
+FROM (((`xly_wh_record` `whr`
+     JOIN `v_productall` `vp`)
+    JOIN `xly_classes` `cla`)
+   JOIN `xly_wh_type` `wht`)
+WHERE ((`whr`.`PRODUCT_ID` = `vp`.`ID`)
+       AND (`whr`.`CLASSES_ID` = `cla`.`CLASSES_ID`)
+       AND (`whr`.`TYPE_ID` = `wht`.`TYPE_ID`))
+ORDER BY `whr`.`ID` DESC$$
+
+DELIMITER ;

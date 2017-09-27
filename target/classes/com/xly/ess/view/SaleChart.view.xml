@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="dtProductType">
+      <PropertyDef name="billTime"/>
+      <PropertyDef name="typeA"/>
+      <PropertyDef name="typeB"/>
+      <PropertyDef name="typeC"/>
+      <PropertyDef name="typeD"/>
+    </DataType>
+  </Model>
+  <View>
+    <DataSet id="dsPdtType">
+      <ClientEvent name="onCreate">self.set(&quot;parameter&quot;,{ctmId : 13,brandId:1})&#xD;
+</ClientEvent>
+      <Property name="dataProvider">salesService#getPdtTypeGroup</Property>
+      <Property name="dataType">[dtProductType]</Property>
+      <Property name="loadMode">lazy</Property>
+    </DataSet>
+    <Container layout="vbox">
+      <Chart>
+        <Property name="legend">
+          <Property name="position">right</Property>
+        </Property>
+        <Property name="height">600</Property>
+        <Property name="title">种类销量分析</Property>
+        <Axes>
+          <CategoryAxis>
+            <Property name="dataSet">dsPdtType</Property>
+            <Property name="properties">billTime</Property>
+            <Property name="labelProperty">billTime</Property>
+          </CategoryAxis>
+          <NumbericAxis>
+            <Property name="dataSet">dsPdtType</Property>
+            <Property name="min">0</Property>
+            <Property name="title">销量（片）</Property>
+          </NumbericAxis>
+        </Axes>
+        <Series>
+          <Line>
+            <Property name="dataSet">dsPdtType</Property>
+            <Property name="showInLegend">true</Property>
+            <Property name="title">全抛釉</Property>
+            <Property name="bindingConfig">
+              <Property name="yProperty">typeA</Property>
+            </Property>
+          </Line>
+          <Line>
+            <Property name="dataSet">dsPdtType</Property>
+            <Property name="bindingConfig">
+              <Property name="yProperty">typeB</Property>
+            </Property>
+            <Property name="title">金刚石</Property>
+            <Property name="showInLegend">true</Property>
+          </Line>
+          <Line>
+            <Property name="dataSet">dsPdtType</Property>
+            <Property name="bindingConfig">
+              <Property name="yProperty">typeC</Property>
+            </Property>
+            <Property name="showInLegend">true</Property>
+            <Property name="title">超白坯</Property>
+          </Line>
+          <Line>
+            <Property name="dataSet">dsPdtType</Property>
+            <Property name="bindingConfig">
+              <Property name="yProperty">typeD</Property>
+            </Property>
+            <Property name="showInLegend">true</Property>
+            <Property name="title">大理石</Property>
+          </Line>
+        </Series>
+      </Chart>
+    </Container>
+  </View>
+</ViewConfig>

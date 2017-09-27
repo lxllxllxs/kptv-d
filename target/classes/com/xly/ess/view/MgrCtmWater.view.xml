@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="dtCtm" parent="dtCustomer">
+      <PropertyDef name="ca"/>
+    </DataType>
+    <DataType name="dtRecord">
+      <PropertyDef name="creater"/>
+      <PropertyDef name="recordId"/>
+      <PropertyDef name="optType"/>
+      <PropertyDef name="balBefore"/>
+      <PropertyDef name="balAfter"/>
+      <PropertyDef name="amountIn"/>
+      <PropertyDef name="amountOut"/>
+      <PropertyDef name="createTime"/>
+    </DataType>
+    <DataType name="dtXlyBillRecord" parent="dtBillRecord">
+      <PropertyDef name="cancel">
+        <Property name="submittable">false</Property>
+      </PropertyDef>
+      <PropertyDef name="typeName">
+        <Property name="label">typeName</Property>
+      </PropertyDef>
+      <PropertyDef name="brandName">
+        <Property name="label">brandName</Property>
+      </PropertyDef>
+      <PropertyDef name="categort">
+        <Property name="label">categort</Property>
+      </PropertyDef>
+      <PropertyDef name="patternNo">
+        <Property name="label">patternNo</Property>
+      </PropertyDef>
+      <PropertyDef name="color">
+        <Property name="label">color</Property>
+      </PropertyDef>
+      <PropertyDef name="gradesName">
+        <Property name="label">gradesName</Property>
+      </PropertyDef>
+      <PropertyDef name="specName">
+        <Property name="label">specName</Property>
+      </PropertyDef>
+      <PropertyDef name="warehouse">
+        <Property name="label">warehouse</Property>
+      </PropertyDef>
+      <PropertyDef name="subTotal">
+        <Property name="submittable">false</Property>
+      </PropertyDef>
+      <PropertyDef name="billNoStr">
+        <Property name="submittable">false</Property>
+      </PropertyDef>
+      <PropertyDef name="billTime">
+        <Property></Property>
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+    </DataType>
+  </Model>
+  <View>
+    <DataSet id="dsCustomer">
+      <Property name="dataType">[dtCtm]</Property>
+      <Property name="dataProvider">saleManagerService#getCtmOfMgr</Property>
+    </DataSet>
+    <DataSet id="dsRecord">
+      <ClientEvent name="onCreate">self.set(&quot;parameter&quot;,{ctmId : 0})</ClientEvent>
+      <Property name="dataType">[dtRecord]</Property>
+      <Property name="dataProvider">customerService#getCtmMoneyRecord</Property>
+      <Property name="pageSize">20</Property>
+    </DataSet>
+    <DataSetDropDown id="dsddCustomer">
+      <ClientEvent name="onValueSelect" signature="self,arg,dsRecord,dsCustomer">var ctmId = view.get(&quot;#dsCustomer.data:#.#ctmId&quot;);&#xD;
+//将实体对象作为参数传入，并异步刷新&#xD;
+dsRecord.set(&quot;parameter&quot;,{ctmId : ctmId}).flushAsync();&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsCustomer</Property>
+      <Property name="displayProperty">ca</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">ca</Property>
+      <Property name="editable">false</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="assignmentMap">ctmId</Property>
+      <Property name="useEmptyItem">false</Property>
+      <Property name="filterOnTyping">false</Property>
+      <Property name="reloadDataOnOpen">true</Property>
+    </DataSetDropDown>
+    <DataSet id="dsBillRecord">
+      <Property name="dataType">[dtXlyBillRecord]</Property>
+      <Property name="dataProvider">billService#getBillRecordByBillNo</Property>
+    </DataSet>
+    <SplitPanel>
+      <Property name="direction">bottom</Property>
+      <Property name="position">330</Property>
+      <MainControl>
+        <Container>
+          <AutoForm id="afCtm">
+            <Property name="cols">*,*</Property>
+            <Property name="labelSeparator">:</Property>
+            <Property name="labelWidth">70</Property>
+            <Property name="createPrivateDataSet">false</Property>
+            <Property name="dataSet">dsCustomer</Property>
+            <AutoFormElement>
+              <Property name="name">ctmName</Property>
+              <Property name="property">ctmName</Property>
+              <Property name="trigger">dsddCustomer</Property>
+              <Property name="label">客户</Property>
+              <Editor/>
+            </AutoFormElement>
+          </AutoForm>
+          <ToolBar>
+            <DataPilot>
+              <Property name="itemCodes">pages,pageSize</Property>
+              <Property name="dataSet">dsRecord</Property>
+            </DataPilot>
+          </ToolBar>
+          <DataGrid id="dgRecord">
+            <ClientEvent name="onDataRowClick" signature="self,arg,dsRecord,dsBillRecord">	var entity = dsRecord.get(&quot;data:#&quot;);&#xD;
+	var optType  = entity.get(&quot;optType&quot;);&#xD;
+if (optType==&quot;开票&quot;) {&#xD;
+			&#xD;
+     var billNo  = entity.get(&quot;recordId&quot;);&#xD;
+                 &#xD;
+     //将实体对象作为参数传入，并异步刷新&#xD;
+     dsBillRecord.set(&quot;parameter&quot;,{billNo : billNo}).flushAsync();&#xD;
+}else{&#xD;
+	dsBillRecord.clear();&#xD;
+}&#xD;
+&#xD;
+</ClientEvent>
+            <Property name="dataSet">dsRecord</Property>
+            <Property name="readOnly">true</Property>
+            <DataColumn name="recordId">
+              <Property name="property">recordId</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">记录号</Property>
+            </DataColumn>
+            <DataColumn name="optType">
+              <Property name="property">optType</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">操作类型</Property>
+            </DataColumn>
+            <DataColumn name="amountIn">
+              <Property name="property">amountIn</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">借方</Property>
+            </DataColumn>
+            <DataColumn name="amountOut">
+              <Property name="property">amountOut</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">贷方</Property>
+            </DataColumn>
+            <DataColumn name="balAfter">
+              <Property name="property">balAfter</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">余额</Property>
+            </DataColumn>
+            <DataColumn name="createTime">
+              <Property name="property">createTime</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">操作时间</Property>
+            </DataColumn>
+            <DataColumn name="creater">
+              <Property name="property">creater</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">操作者</Property>
+            </DataColumn>
+          </DataGrid>
+        </Container>
+      </MainControl>
+      <SideControl>
+        <Container>
+          <DataGrid id="dgBillRecord">
+            <Property name="dataSet">dsBillRecord</Property>
+            <Property name="readOnly">true</Property>
+            <Property name="height">200</Property>
+            <Property name="selectionMode">none</Property>
+            <Property name="dynaRowHeight">false</Property>
+            <DataColumn>
+              <Property name="property">billNoStr</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">票号</Property>
+              <Property name="name">billNoStr</Property>
+            </DataColumn>
+            <DataColumn name="billTime">
+              <Property name="property">billTime</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">开票时间</Property>
+              <Property name="width">120</Property>
+            </DataColumn>
+            <DataColumn name="patternNo">
+              <Property name="property">patternNo</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">编号</Property>
+            </DataColumn>
+            <DataColumn name="color">
+              <Property name="property">color</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">色别</Property>
+            </DataColumn>
+            <DataColumn name="gradesName">
+              <Property name="property">gradesName</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">等级</Property>
+            </DataColumn>
+            <DataColumn name="count">
+              <Property name="property">count</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">数量</Property>
+            </DataColumn>
+            <DataColumn name="price">
+              <Property name="property">price</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">单价</Property>
+            </DataColumn>
+            <DataColumn>
+              <Property name="property">subTotal</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">小计</Property>
+              <Property name="name">subTotal</Property>
+              <Property name="displayFormat">#,##0.00</Property>
+              <Property name="dataType">double</Property>
+              <Editor/>
+            </DataColumn>
+            <DataColumn name="typeName">
+              <Property name="property">typeName</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">种类</Property>
+            </DataColumn>
+            <DataColumn name="brandName">
+              <Property name="property">brandName</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">品牌</Property>
+            </DataColumn>
+          </DataGrid>
+        </Container>
+      </SideControl>
+    </SplitPanel>
+  </View>
+</ViewConfig>

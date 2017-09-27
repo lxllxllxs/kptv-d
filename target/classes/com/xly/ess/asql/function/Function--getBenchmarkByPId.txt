@@ -1,0 +1,15 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP FUNCTION IF EXISTS `getBenchmarkByPId`$$
+
+CREATE DEFINER=`root`@`%` FUNCTION `getBenchmarkByPId`(pId INT) RETURNS DOUBLE
+BEGIN
+    DECLARE V_benchmark DOUBLE DEFAULT 0;
+    SELECT BENCHMARK INTO V_benchmark FROM v_product WHERE ID=pId;
+    RETURN V_benchmark;
+	
+    END$$
+
+DELIMITER ;

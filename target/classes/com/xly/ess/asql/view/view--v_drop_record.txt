@@ -1,0 +1,53 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP VIEW IF EXISTS `v_drop_record`$$
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_drop_record` AS 
+SELECT
+  `db`.`BILL_NO`     AS `BILL_NO`,
+  `db`.`CREATER`     AS `dropCreater`,
+  `db`.`CREATE_DATE` AS `dropDate`,
+  `db`.`REASON`      AS `reason`,
+  `vb`.`billNo`      AS `billNo`,
+  `vb`.`billNoStr`   AS `billNoStr`,
+  `vb`.`billTime`    AS `billTime`,
+  `vb`.`billType`    AS `billType`,
+  `vb`.`carNo`       AS `carNo`,
+  `vb`.`creater`     AS `creater`,
+  `vb`.`driverPhone` AS `driverPhone`,
+  `vb`.`freight`     AS `freight`,
+  `vb`.`remark`      AS `remark`,
+  `vb`.`bState`      AS `bState`,
+  `vb`.`count`       AS `count`,
+  `vb`.`price`       AS `price`,
+  `vb`.`subTotal`    AS `subTotal`,
+  `vb`.`recordId`    AS `recordId`,
+  `vb`.`ctmName`     AS `ctmName`,
+  `vb`.`ctmId`       AS `ctmId`,
+  `vb`.`address`     AS `address`,
+  `vb`.`salesMgrId`  AS `salesMgrId`,
+  `vb`.`stockId`     AS `stockId`,
+  `vb`.`warehouse`   AS `warehouse`,
+  `vb`.`state`       AS `state`,
+  `vb`.`stock`       AS `stock`,
+  `vb`.`id`          AS `id`,
+  `vb`.`categort`    AS `categort`,
+  `vb`.`color`       AS `color`,
+  `vb`.`patternNo`   AS `patternNo`,
+  `vb`.`brandName`   AS `brandName`,
+  `vb`.`brandId`     AS `brandId`,
+  `vb`.`gradesName`  AS `gradesName`,
+  `vb`.`specId`      AS `specId`,
+  `vb`.`specName`    AS `specName`,
+  `vb`.`typeName`    AS `typeName`,
+  `vb`.`qty`         AS `qty`,
+  `vb`.`gradesId`    AS `gradesId`,
+  `vb`.`typeId`      AS `typeId`,
+  `vb`.`mgrName`     AS `mgrName`
+FROM (`xly_drop_bill` `db`
+   JOIN `v_billrecord` `vb`)
+WHERE (`db`.`BILL_NO` = `vb`.`billNo`)$$
+
+DELIMITER ;

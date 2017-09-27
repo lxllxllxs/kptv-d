@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="dtXlyBillRecord">
+      <PropertyDef name="typeName">
+        <Property name="label">typeName</Property>
+      </PropertyDef>
+      <PropertyDef name="brandName">
+        <Property name="label">brandName</Property>
+      </PropertyDef>
+      <PropertyDef name="categort">
+        <Property name="label">categort</Property>
+      </PropertyDef>
+      <PropertyDef name="patternNo">
+        <Property name="label">patternNo</Property>
+      </PropertyDef>
+      <PropertyDef name="color">
+        <Property name="label">color</Property>
+      </PropertyDef>
+      <PropertyDef name="gradesName">
+        <Property name="label">gradesName</Property>
+      </PropertyDef>
+      <PropertyDef name="specName">
+        <Property name="label">specName</Property>
+      </PropertyDef>
+      <PropertyDef name="warehouse">
+        <Property name="label">warehouse</Property>
+      </PropertyDef>
+      <PropertyDef name="billTime">
+        <Property></Property>
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="freight">
+        <Property name="dataType">int</Property>
+      </PropertyDef>
+      <PropertyDef name="driverPhone">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="carNo">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="creater">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="remark">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="billType">
+        <Property></Property>
+      </PropertyDef>
+      <PropertyDef name="mgrName"/>
+      <PropertyDef name="ctmName">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="address"/>
+      <PropertyDef name="typeId"/>
+      <PropertyDef name="brandId"/>
+      <PropertyDef name="gradesId"/>
+      <PropertyDef name="ctmId"/>
+      <PropertyDef name="subTotal">
+        <Property name="submittable">true</Property>
+      </PropertyDef>
+      <PropertyDef name="recordId">
+        <Property name="dataType">int</Property>
+      </PropertyDef>
+      <PropertyDef name="billNo">
+        <Property name="dataType">int</Property>
+      </PropertyDef>
+      <PropertyDef name="billNoStr">
+        <Property name="submittable">false</Property>
+      </PropertyDef>
+      <PropertyDef name="stockId">
+        <Property name="dataType">int</Property>
+      </PropertyDef>
+      <PropertyDef name="count">
+        <Property name="dataType">int</Property>
+      </PropertyDef>
+      <PropertyDef name="qty"/>
+      <PropertyDef name="price">
+        <Property name="dataType">double</Property>
+      </PropertyDef>
+    </DataType>
+    <DataType name="dtCtm" parent="dtCustomer">
+      <PropertyDef name="ca"/>
+    </DataType>
+    <DataType name="dataType3">
+      <PropertyDef name="total">
+        <Property name="label">total</Property>
+        <Property name="displayFormat">#,##0.00元</Property>
+        <Property name="dataType">double</Property>
+      </PropertyDef>
+    </DataType>
+  </Model>
+  <View>
+    <DataSet id="dsTotal">
+      <ClientEvent name="onCreate">self.insert({&#xD;
+	$dataType: &quot;dsTotal&quot;,&#xD;
+	total : 0&#xD;
+});</ClientEvent>
+      <Property name="dataType">dataType3</Property>
+    </DataSet>
+    <DataSet id="dsBillRecord">
+      <ClientEvent name="onLoadData" signature="self,arg,dsTotal">var total=0.0;&#xD;
+        var entityList =self.getData();&#xD;
+        entityList.each(function(entity){&#xD;
+             var subTotal = entity.get(&quot;subTotal&quot;);&#xD;
+			 var freight = entity.get(&quot;freight&quot;);&#xD;
+             total+=subTotal+freight;&#xD;
+        });&#xD;
+		&#xD;
+        //设置DS的值&#xD;
+        dsTotal.getData().set(&quot;total&quot;,total);&#xD;
+		//显示合计&#xD;
+		view.get(&quot;#afTotal&quot;).refresh();</ClientEvent>
+      <Property name="dataType">[dtXlyBillRecord]</Property>
+      <Property name="dataProvider">billService#getAllBill</Property>
+      <Property name="pageSize">20</Property>
+    </DataSet>
+    <DataSet id="dsXlyPdtType">
+      <Property name="dataType">[dtPdtType]</Property>
+      <Property name="dataProvider">productService#getType</Property>
+    </DataSet>
+    <DataSet id="dsXlyPdtBra">
+      <Property name="dataType">[dtPdtBra]</Property>
+      <Property name="dataProvider">productService#getBrand</Property>
+    </DataSet>
+    <DataSet id="dsXlyPdtGd">
+      <Property name="dataType">[dtPdtGd]</Property>
+      <Property name="dataProvider">productService#getGrades</Property>
+    </DataSet>
+    <DataSet id="dsCustomer">
+      <Property name="dataType">[dtCtm]</Property>
+      <Property name="dataProvider">customerService#getCtmByNameSimple</Property>
+    </DataSet>
+    <Container>
+      <AutoForm id="afCondition">
+        <Property name="createPrivateDataSet">true</Property>
+        <Property name="cols">*,*,*,*</Property>
+        <Property name="labelSeparator">：</Property>
+        <Property name="labelAlign">center</Property>
+        <Property name="labelSpacing">1</Property>
+        <AutoFormElement>
+          <Property name="name">typeName</Property>
+          <Property name="label">种类</Property>
+          <Property name="trigger">dsddPdtTyp</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">brandName</Property>
+          <Property name="label">品牌</Property>
+          <Property name="trigger">dsddPdtBra</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">patternNo</Property>
+          <Property name="label">编号</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">gradesName</Property>
+          <Property name="label">等级</Property>
+          <Property name="trigger">dsddPdtGd</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">billNo</Property>
+          <Property name="label">票号</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">billTime</Property>
+          <Property name="label">开票时间</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">creater</Property>
+          <Property name="label">开票员</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">billType</Property>
+          <Property name="label">开票类型</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">mgrName</Property>
+          <Property name="label">销售经理</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">ctmName</Property>
+          <Property name="label">客户名</Property>
+          <Editor/>
+        </AutoFormElement>
+        <AutoFormElement>
+          <Property name="name">address</Property>
+          <Property name="label">地区</Property>
+          <Editor/>
+        </AutoFormElement>
+      </AutoForm>
+      <AutoForm id="afTotal">
+        <Property name="labelSeparator">：</Property>
+        <Property name="dataSet">dsTotal</Property>
+        <Property name="cols">*,*,*,*,*</Property>
+        <Property name="style">
+          <Property name="color">#e22018</Property>
+        </Property>
+        <AutoFormElement>
+          <Property name="name">total</Property>
+          <Property name="property">total</Property>
+          <Property name="label">总金额</Property>
+          <Property name="editorType">Label</Property>
+          <Editor/>
+        </AutoFormElement>
+      </AutoForm>
+      <ToolBar>
+        <DataPilot>
+          <Property name="itemCodes">pages,pageSize</Property>
+          <Property name="dataSet">dsBillRecord</Property>
+        </DataPilot>
+        <ToolBarButton id="btnQuery">
+          <ClientEvent name="onClick" signature="self,arg,afCondition,dsBillRecord">//获取afCondition绑定的实体对象&#xD;
+var entity = afCondition.get(&quot;entity&quot;);&#xD;
+//将实体对象作为参数传入，并异步刷新&#xD;
+dsBillRecord.set(&quot;parameter&quot;,entity).flushAsync();</ClientEvent>
+          <Property name="caption">查询</Property>
+          <Property name="icon"> url(>skin>common/icons.gif) -20px -40px</Property>
+        </ToolBarButton>
+        <ToolBarButton id="btnExport">
+          <Property name="caption">导出</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -120px</Property>
+          <Property name="action">export2ReportAction1</Property>
+        </ToolBarButton>
+      </ToolBar>
+      <DataGrid id="dgBillRecord">
+        <Property name="dataSet">dsBillRecord</Property>
+        <Property name="dynaRowHeight">false</Property>
+        <Property name="readOnly">true</Property>
+        <DataColumn>
+          <Property name="property">billNoStr</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">票号</Property>
+          <Property name="name">billNoStr</Property>
+        </DataColumn>
+        <DataColumn name="billTime">
+          <Property name="property">billTime</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">开票时间</Property>
+          <Property name="width">120</Property>
+        </DataColumn>
+        <DataColumn name="ctmName">
+          <Property name="property">ctmName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">客户</Property>
+        </DataColumn>
+        <DataColumn name="address">
+          <Property name="property">address</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">地区</Property>
+        </DataColumn>
+        <DataColumn name="mgrName">
+          <Property name="property">mgrName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">销售经理</Property>
+        </DataColumn>
+        <DataColumn name="typeName">
+          <Property name="property">typeName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">种类</Property>
+        </DataColumn>
+        <DataColumn name="brandName">
+          <Property name="property">brandName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">品牌</Property>
+        </DataColumn>
+        <DataColumn name="patternNo">
+          <Property name="property">patternNo</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">编号</Property>
+        </DataColumn>
+        <DataColumn name="color">
+          <Property name="property">color</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">色号</Property>
+        </DataColumn>
+        <DataColumn name="gradesName">
+          <Property name="property">gradesName</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">等级</Property>
+        </DataColumn>
+        <DataColumn name="warehouse">
+          <Property name="property">warehouse</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">库位</Property>
+        </DataColumn>
+        <DataColumn name="count">
+          <Property name="property">count</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">数量</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="align">center</Property>
+          <Property name="caption">每箱</Property>
+          <Property name="name">qty</Property>
+          <Property name="property">qty</Property>
+          <Editor/>
+        </DataColumn>
+        <DataColumn name="price">
+          <Property name="property">price</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">单价</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="property">subTotal</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">小计(元)</Property>
+          <Property name="name">subTotal</Property>
+          <Property name="displayFormat">#,##0.00</Property>
+          <Property name="dataType">double</Property>
+        </DataColumn>
+        <DataColumn>
+          <Property name="name">freight</Property>
+          <Property name="property">freight</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">运费</Property>
+          <Editor/>
+        </DataColumn>
+        <DataColumn name="billType">
+          <Property name="property">billType</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">开票类型</Property>
+        </DataColumn>
+        <DataColumn name="creater">
+          <Property name="property">creater</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">开票员</Property>
+        </DataColumn>
+        <DataColumn name="remark">
+          <Property name="property">remark</Property>
+          <Property name="align">center</Property>
+          <Property name="caption">备注</Property>
+        </DataColumn>
+      </DataGrid>
+    </Container>
+    <DataSetDropDown id="dsddPdtTyp">
+      <ClientEvent name="onReady">&#xD;
+&#xD;
+</ClientEvent>
+      <ClientEvent name="onFilterItems">&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsXlyPdtType</Property>
+      <Property name="displayProperty">typeName</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="property">typeName</Property>
+      <Property name="editable">false</Property>
+      <Property name="assignmentMap">typeId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddPdtGd">
+      <ClientEvent name="beforeExecute">//var gradesId = view.get(&quot;#dsXlyProduct.data:#.#GRADES_ID&quot;)&#xD;
+//弹出一个对话框  &#xD;
+ //  alert(&quot;gradesId=&quot;+gradesId);  &#xD;
+ //   var dsXlyProductSave = view.get(&quot;#dsXlyProductSave&quot;);&#xD;
+ //   dsXlyProductSave.set(&quot;parameter&quot;,{&#xD;
+ //       &quot;gradesId&quot;: gradesId&#xD;
+  //  });&#xD;
+  //  dsXlyProductSave.flushAsync();</ClientEvent>
+      <Property name="dataSet">dsXlyPdtGd</Property>
+      <Property name="displayProperty">gradesName</Property>
+      <Property name="property">gradesName</Property>
+      <Property name="assignmentMap">gradesId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddPdtBra">
+      <ClientEvent name="beforeExecute">//var specId = view.get(&quot;#dsXlyProduct.data:#.#SPEC_ID&quot;)&#xD;
+//    var dsXlyProductSave = view.get(&quot;#dsXlyProductSave&quot;);&#xD;
+//    dsXlyProductSave.set(&quot;parameter&quot;,{&#xD;
+//        &quot;specId&quot;: specId&#xD;
+ //   });&#xD;
+ //   dsXlyProductSave.flushAsync();</ClientEvent>
+      <ClientEvent name="onReady">&#xD;
+</ClientEvent>
+      <Property name="dataSet">dsXlyPdtBra</Property>
+      <Property name="displayProperty">brandName</Property>
+      <Property name="property">brandName</Property>
+      <Property name="assignmentMap">brandId</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="editable">false</Property>
+      <Property name="useEmptyItem">true</Property>
+    </DataSetDropDown>
+    <Export2ReportAction id="export2ReportAction1">
+      <Property name="fileName">BillRecord</Property>
+      <Property name="extension">xlsx</Property>
+      <Property name="template">dgBillRecord</Property>
+      <Property name="dataScope">serverAll</Property>
+      <Property name="titleName">开票记录表</Property>
+      <Property name="showTitle">true</Property>
+      <Property name="dataFontColor">#333333</Property>
+      <Property name="maxSize">5000</Property>
+    </Export2ReportAction>
+    <Dialog id="dialogAdd">
+      <Property name="caption">填写信息</Property>
+      <Property name="width">300</Property>
+      <Property name="height">200</Property>
+      <Property name="closeAction">hide</Property>
+      <Buttons>
+        <Button id="dBtnSave">
+          <ClientEvent name="onClick" signature="self,arg,dialogAdd,dsBillRecord,updateactionSave">var billNo = view.get(&quot;#dsBillRecord.data:#.#billNo&quot;);&#xD;
+&#xD;
+&#xD;
+var entity1 = view.get(&quot;#afDropBill.entity&quot;);&#xD;
+var reason = entity1.get(&quot;invalidWhy&quot;);&#xD;
+&#xD;
+&#xD;
+//在保存操作完成后的回调函数中将编辑弹出框隐藏&#xD;
+updateactionSave.set(&quot;parameter&quot;,{&#xD;
+	&quot;billNo&quot;:billNo,&#xD;
+	&quot;reason&quot;:reason&#xD;
+}).execute(function(){&#xD;
+	&#xD;
+    dialogAdd.hide();&#xD;
+&#xD;
+})&#xD;
+&#xD;
+&#xD;
+</ClientEvent>
+          <Property name="caption">确定</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -140px -20px</Property>
+        </Button>
+        <Button id="dBtnCancel">
+          <ClientEvent name="onClick" signature="self,arg,dialogAdd">&#xD;
+dialogAdd.hide();</ClientEvent>
+          <Property name="caption">取消</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
+        </Button>
+      </Buttons>
+      <Children>
+        <AutoForm id="afDropBill">
+          <Property name="readOnly">false</Property>
+          <Property name="createPrivateDataSet">true</Property>
+          <Property name="labelWidth">70</Property>
+          <Property name="labelSeparator">:</Property>
+          <Property name="cols">*</Property>
+          <AutoFormElement>
+            <Property name="name">invalidWhy</Property>
+            <Property name="label">作废原因</Property>
+            <Editor/>
+          </AutoFormElement>
+        </AutoForm>
+      </Children>
+      <Tools/>
+    </Dialog>
+    <UpdateAction id="updateactionSave">
+      <ClientEvent name="onFailure"> </ClientEvent>
+      <ClientEvent name="onSuccess" signature="self,arg,dsBillRecord">var info = self.get(&quot;returnValue&quot;);&#xD;
+if(info.result){&#xD;
+	//刷新数据&#xD;
+	dsBillRecord.flush();&#xD;
+	dorado.MessageBox.alert(info.msg);&#xD;
+}else{&#xD;
+	dorado.MessageBox.alert(info.msg, {&#xD;
+    icon: &quot;WARNING&quot;&#xD;
+});&#xD;
+}&#xD;
+&#xD;
+ </ClientEvent>
+      <Property name="dataResolver">billService#dropBill</Property>
+      <Property name="executingMessage">正在保存。。。</Property>
+      <Property name="hotkey">ctrl+s</Property>
+    </UpdateAction>
+    <DataSetDropDown id="dsddCustomer">
+      <Property name="dataSet">dsCustomer</Property>
+      <Property name="displayProperty">ca</Property>
+      <Property name="dynaFilter">true</Property>
+      <Property name="property">ca</Property>
+      <Property name="editable">false</Property>
+      <Property name="autoOpen">true</Property>
+      <Property name="assignmentMap">ctmId</Property>
+      <Property name="useEmptyItem">true</Property>
+      <Property name="filterOnTyping">true</Property>
+    </DataSetDropDown>
+  </View>
+</ViewConfig>

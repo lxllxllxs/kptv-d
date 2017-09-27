@@ -1,0 +1,34 @@
+DELIMITER $$
+
+ALTER ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `v_freeze` AS 
+SELECT
+  `whf`.`FREEZE_ID`   AS `freezeId`,
+  `whf`.`STOCK_ID`    AS `stockId`,
+  `whf`.`WAREHOUSE`   AS `warehouse`,
+  `ctm`.`CTM_NAME`    AS `ctmName`,
+  `ctm`.`ADDRESS`    AS `address`,
+  `whf`.`CTM_ID`      AS `ctmId`,
+  `whf`.`COUNT`       AS `count`,
+  `whf`.`CREATE_TIME` AS `createTime`,
+  `whf`.`CREATER`     AS `creater`,
+  `whf`.`END_DATE`    AS `endDate`,
+  `whf`.`REMARK`      AS `remark`,
+  `whf`.`STATE`       AS `state`,
+  `vp`.`BRAND_NAME`   AS `brandName`,
+  `vp`.`TYPE_NAME`    AS `typeName`,
+  `vp`.`CATEGORT`     AS `categort`,
+  `vp`.`COLOR`        AS `color`,
+  `vp`.`GRADES_NAME`  AS `gradesName`,
+  `vp`.`PATTERN_NO`   AS `patternNo`,
+  `vp`.`SPEC_NAME`    AS `specName`
+FROM (((`xly_customer` `ctm`
+     JOIN `xly_wh_freeze` `whf`)
+    JOIN `xly_pdt_stock` `pdts`)
+   JOIN `v_productall` `vp`)
+WHERE ((`ctm`.`CTM_ID` = `whf`.`CTM_ID`)
+       AND (`whf`.`STOCK_ID` = `pdts`.`ID`)
+       AND (`pdts`.`PRODUCT_ID` = `vp`.`ID`)
+       AND (`whf`.`STATE` = 1))
+ORDER BY `whf`.`FREEZE_ID` DESC$$
+
+DELIMITER ;

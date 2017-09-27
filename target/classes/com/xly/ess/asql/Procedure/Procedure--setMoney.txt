@@ -1,0 +1,12 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP PROCEDURE IF EXISTS `setMoney`$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `setMoney`(IN ctmId INT,IN money DOUBLE)
+BEGIN
+	 UPDATE xly_customer SET  money=ENCODE(money,'xly')  WHERE CTM_ID=ctmId;
+    END$$
+
+DELIMITER ;

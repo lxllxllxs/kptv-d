@@ -1,0 +1,6 @@
+数据库引擎改为 Innob 
+1.xly_inventory_record
+2.xly_move_stock
+3.v_stock_inventory
+4.updataMoney存储过程
+

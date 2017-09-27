@@ -1,0 +1,20 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP PROCEDURE IF EXISTS `creatMonth`$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `creatMonth`()
+BEGIN
+  DECLARE num INT ;
+  SET num = 1 ;
+  WHILE
+    num < 13 DO 
+    INSERT INTO xly_year_month (ym) 
+    VALUES
+      (CONCAT('2016-',LPAD(num,2,0))) ;
+    SET num = num + 1 ;
+  END WHILE ;
+END$$
+
+DELIMITER ;

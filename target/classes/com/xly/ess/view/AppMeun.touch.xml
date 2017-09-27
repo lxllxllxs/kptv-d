@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig meta="clientType:touch">
+  <Arguments/>
+  <Context/>
+  <Model/>
+  <View>
+    <Container layoutConstraint="padding:100">
+      <Property name="width">170</Property>
+      <Property name="height">120</Property>
+      <TouchButton>
+        <ClientEvent name="onClick">location.href=&quot;com.xly.ess.view.AppStockList.d&quot;;&#xD;
+</ClientEvent>
+        <Property name="caption">查看库存</Property>
+        <Property name="width">150</Property>
+        <Property name="height">40</Property>
+      </TouchButton>
+      <TouchButton layoutConstraint="bottom">
+        <ClientEvent name="onClick">location.href=&quot;com.xly.ess.view.AppCtmLedgers.d&quot;;</ClientEvent>
+        <Property name="caption">客户账本</Property>
+        <Property name="height">40</Property>
+        <Property name="width">150</Property>
+      </TouchButton>
+    </Container>
+  </View>
+</ViewConfig>

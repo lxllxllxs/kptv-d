@@ -1,0 +1,20 @@
+DELIMITER $$
+
+USE `xly`$$
+
+DROP PROCEDURE IF EXISTS `creatCtm`$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `creatCtm`(ctmCount INT ,mgrId INT )
+BEGIN
+  DECLARE num INT  ;
+  DECLARE mgrName VARCHAR(12) ;
+  SELECT vm.`salesMgrName` INTO mgrName FROM v_mgr vm WHERE vm.`salesMgrId`=mgrId;
+  SET num = 1 ;
+  WHILE
+    num < ctmCount DO 
+    INSERT INTO xly_customer (CTM_NAME,SALES_MGR_ID,ADDRESS)VALUES(CONCAT('客户',num,'-',mgrName),mgrId,CONCAT(mgrId,'地址',num));
+    SET num = num + 1 ;
+  END WHILE ;
+END$$
+
+DELIMITER ;
