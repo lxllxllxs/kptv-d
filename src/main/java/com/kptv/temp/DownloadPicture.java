@@ -48,22 +48,23 @@ public class DownloadPicture extends KptvBase {
         try {  
             Connection connection = (Connection) JdbcUtil.getConnection();  
             Statement statement = (Statement) connection.createStatement();  
-            String sql = "select * from kptv_temp"; //查询语句换位相应select语句  
+            String sql = "select * from kptv_temp where isdownload=0"; //查询语句换位相应select语句  
             ResultSet resultSet = statement.executeQuery(sql);  
             while (resultSet.next()) {  
                 String id = resultSet.getString("ID");  
+                String no = resultSet.getString("no");  
                 String childName = resultSet.getString("childName");  
                 String kindergarten = resultSet.getString("kindergarten");  
                 String phone = resultSet.getString("phone");  
                 String parentName = resultSet.getString("parentName");  
                 String urlString = resultSet.getString("urlString");  
-                //创建文件夹
-                String dirsName=childName+" "+kindergarten+" "+parentName+" "+phone;//暂时不用
-                CCRDFile.createDir(Constant.FILE_PATH+id);
+                //创建文件夹"#"
+                String dirsName=no+"#"+childName+"#"+parentName+"#"+phone+"#"+kindergarten;//暂时不用
+                CCRDFile.createDir(Constant.FILE_PATH+dirsName);
                 //切割链接 获得链接集合
                 urlString=urlString.replaceAll("@@", "#");
                 urlList= new ArrayList<String>(Arrays.asList(urlString.split("#")));
-                downloadPicture(urlList,dirsName);
+                downloadPicture(urlList,dirsName,Integer.valueOf(id));
             }  
             JdbcUtil.free(resultSet, statement, connection);  
         } catch (SQLException e) {  
@@ -75,12 +76,12 @@ public class DownloadPicture extends KptvBase {
     * 传入要下载的图片的url列表，将url所对应的图片下载到本地 
     * 1.获取所有数据集
     * 2.读取数据行
-    * 3.一行数据包括：1.宝贝姓名2.宝贝幼儿园3.家长手机号4家长姓名5.图片链接字符串
+    * 3.一行数据包括：0.编号1.宝贝姓名2.宝贝幼儿园3.家长手机号4家长姓名5.图片链接字符串
     * 4.每行数据以 宝贝姓名+家长姓名+手机号+幼儿园建立文件夹
     * 5.分割图片链接字符串，逐个下载保存
     * @param urlList 
     */  
-   private void downloadPicture(ArrayList<String> urlList,String filePath) {  
+   private void downloadPicture(ArrayList<String> urlList,String filePath,int id) {  
        URL url = null;  
        int imageNumber = 0;  
        for (String urlString : urlList) {  
@@ -103,6 +104,16 @@ public class DownloadPicture extends KptvBase {
                e.printStackTrace();  
            }  
        }  
+       if(imageNumber!=urlList.size()){
+    	   String sql="UPDATE `kptv_temp` SET isdownload=0  WHERE ID="+id;
+    	   return ;
+       }
+       String sql="UPDATE `kptv_temp` SET isdownload=1  WHERE ID="+id;
+		try {
+			updateBySQL(sql);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
    }  
     
     
