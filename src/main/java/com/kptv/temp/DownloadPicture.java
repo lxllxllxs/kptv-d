@@ -57,9 +57,12 @@ public class DownloadPicture extends KptvBase {
                 String kindergarten = resultSet.getString("kindergarten");  
                 String phone = resultSet.getString("phone");  
                 String parentName = resultSet.getString("parentName");  
+                String sex = resultSet.getString("sex");  
+                String age = resultSet.getString("age");  
+                String manifesto = resultSet.getString("manifesto");  
                 String urlString = resultSet.getString("urlString");  
                 //创建文件夹"#"
-                String dirsName=no+"#"+childName+"#"+parentName+"#"+phone+"#"+kindergarten;//暂时不用
+                String dirsName=no+"#"+childName+"#"+parentName+"#"+phone+"#"+kindergarten+"#"+sex+"#"+age+"#"+manifesto;//暂时不用
                 CCRDFile.createDir(Constant.FILE_PATH+dirsName);
                 //切割链接 获得链接集合
                 urlString=urlString.replaceAll("@@", "#");
@@ -80,8 +83,9 @@ public class DownloadPicture extends KptvBase {
     * 4.每行数据以 宝贝姓名+家长姓名+手机号+幼儿园建立文件夹
     * 5.分割图片链接字符串，逐个下载保存
     * @param urlList 
+     * @throws SQLException 
     */  
-   private void downloadPicture(ArrayList<String> urlList,String filePath,int id) {  
+   private void downloadPicture(ArrayList<String> urlList,String filePath,int id) throws SQLException {  
        URL url = null;  
        int imageNumber = 0;  
        for (String urlString : urlList) {  
@@ -106,14 +110,11 @@ public class DownloadPicture extends KptvBase {
        }  
        if(imageNumber!=urlList.size()){
     	   String sql="UPDATE `kptv_temp` SET isdownload=0  WHERE ID="+id;
+   			updateBySQL(sql);
     	   return ;
        }
        String sql="UPDATE `kptv_temp` SET isdownload=1  WHERE ID="+id;
-		try {
-			updateBySQL(sql);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
+   		updateBySQL(sql);
    }  
     
     

@@ -31,12 +31,15 @@ public class Upload extends KptvBase{
 	
 	private OkHttpClient mClient=new OkHttpClient();
 	public static void main(String[] a) throws IOException{
-		Upload upload=new Upload();
+//		Upload upload=new Upload();
 		File file =new File("D:/kpbtv/lxl/");
 		File [] lists=file.listFiles();
 		for(File folder:lists){
 			if(folder.isDirectory()) { 
-				upload.step2(file);
+//				upload.step2(file);
+				if(folder.list().length==0){
+					System.out.println(folder.getAbsolutePath());
+				}
 			}
 		}
 	}
